@@ -11,7 +11,7 @@ const MastersForm = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/services');
+                const response = await axios.get('http://31.172.75.47:5000/api/services');
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
