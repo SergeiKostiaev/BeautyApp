@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const Master = require('../models/master');
+const Master = require('../models/Master');
 
 // Настройка multer для хранения файлов
 const storage = multer.diskStorage({
