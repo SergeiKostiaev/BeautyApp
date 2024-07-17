@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Bookings = require('../models/booking'); // Предполагается, что у вас есть модель Bookings
+const Bookings = require('../models/Booking'); // Предполагается, что у вас есть модель Bookings
 
 // Получение всех бронирований
 router.get('/', async (req, res) => {
