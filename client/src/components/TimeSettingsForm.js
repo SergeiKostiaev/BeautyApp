@@ -20,7 +20,7 @@ const TimeSettingsForm = () => {
 
     const fetchMasters = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/masters');
+            const response = await axios.get('http://31.172.75.47:5000/api/masters');
             setMasters(response.data);
         } catch (error) {
             console.error('Ошибка загрузки мастеров:', error);
@@ -35,7 +35,7 @@ const TimeSettingsForm = () => {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5000/api/time-slots/master/${masterId}?date=${selectedDate}`);
+            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}?date=${selectedDate}`);
             console.log('Слоты времени успешно получены:', response.data);
             setTimeSlots(response.data);
         } catch (error) {
@@ -54,7 +54,7 @@ const TimeSettingsForm = () => {
         };
 
         try {
-            const response = await axios.post('http://localhost:5000/api/time-slots', requestData);
+            const response = await axios.post('http://31.172.75.47:5000/api/time-slots', requestData);
             const newTimeSlot = response.data;
             setTimeSlots(prevTimeSlots => [...prevTimeSlots, newTimeSlot]);
             setStartTime('');

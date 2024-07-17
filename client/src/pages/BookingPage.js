@@ -39,7 +39,7 @@ const BookingPage = () => {
     const fetchAvailableTimeSlots = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5000/api/time-slots?date=${date}&serviceId=${serviceId}`);
+            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots?date=${date}&serviceId=${serviceId}`);
             const timeSlotsWithAvailability = response.data.map(slot => ({
                 ...slot,
                 isAvailable: !slot.booked,
@@ -72,7 +72,7 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            const response = await axios.post('http://localhost:5000/api/bookings', bookingData);
+            const response = await axios.post('http://31.172.75.47:5000/api/bookings', bookingData);
             console.log('Booking created:', response.data);
 
             fetchAvailableTimeSlots();

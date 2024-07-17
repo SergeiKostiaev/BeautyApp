@@ -34,7 +34,7 @@ const MastersForm = () => {
         formData.append('service', selectedService);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/masters', formData, {
+            const response = await axios.post('http://31.172.75.47:5000/api/masters', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
