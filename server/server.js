@@ -3,21 +3,25 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
-
 const bookingsRouter = require('./routes/bookings');
 const timeSlotsRouter = require('./routes/timeSlots');
 const mastersRouter = require('./routes/masters'); // Подключение роутера для мастеров
 const servicesRouter = require('./routes/services'); // Подключение роутера для услуг
+const schedulesRouter = require('./routes/schedules');
 const Service = require('./models/service');
 const Master = require('./models/master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
-const schedulesRouter = require('./routes/schedules');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+const corsOptions = {
+    origin: 'http://31.172.75.47:3000', // ваш фронтенд URL
+    optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -67,7 +71,7 @@ app.get('/api/schedules/:masterId', async (req, res) => {
 app.get('/api/timeslots/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const timeslots = await Timeslot.find({ masterId }); // Пример использования Mongoose
+        const timeslots = await TimeSlot.find({ masterId }); // Пример использования Mongoose
         res.json(timeslots);
     } catch (error) {
         console.error('Error fetching timeslots:', error);
@@ -92,7 +96,7 @@ app.post('/api/services/new', upload.single('image'), async (req, res) => {
     }
 });
 
-// Маршрут для получения всех услуг (дублирование удалено)
+// Маршрут для получения всех услуг
 app.get('/api/services', async (req, res) => {
     try {
         const services = await Service.find();
@@ -142,8 +146,6 @@ app.post('/api/time-slots', async (req, res) => {
             return res.status(400).json({ message: 'Отсутствуют обязательные поля' });
         }
 
-        // Дополнительные проверки формата данных (например, временной формат)
-
         // Поиск мастера по ID
         const master = await Master.findById(masterId);
         if (!master) {
@@ -170,7 +172,6 @@ app.post('/api/time-slots', async (req, res) => {
         res.status(500).json({ message: 'Ошибка сервера' });
     }
 });
-
 
 app.listen(PORT, () => {
     console.log(`Сервер запущен на порту ${PORT}`);
