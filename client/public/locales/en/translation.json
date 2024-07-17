@@ -1,0 +1,57 @@
+{
+  "Login": "Login",
+  "select_service": "Select a Service",
+  "next": "Next",
+  "services": {
+    "Haircut": "Haircut",
+    "Manicure": "Manicure",
+    "Pedicure": "Pedicure",
+    "Massage": "Massage"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "login_button": "Login",
+    "invalid_credentials": "Invalid credentials"
+  },
+  "booking_page": {
+    "title": "Book an Appointment",
+    "customer_name": "Customer Name",
+    "customer_phone": "Customer Phone",
+    "date": "Date",
+    "select_time": "Select Time",
+    "book_button": "Book",
+    "fill_all_fields": "Please fill in all fields",
+    "loading_error": "Error loading available time slots",
+    "booking_error": "Error creating booking",
+    "no_time_slots": "no_time_slots"
+  },
+  "time_settings_form": {
+    "title": "Time Slots Settings",
+    "select_master": "Select Master",
+    "select_date": "Select Date",
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "add_interval": "Add Interval",
+    "no_time_slots": "No time slots available for the selected master and date",
+    "loading_masters_error": "Error loading masters",
+    "loading_time_slots_error": "Error fetching time slots",
+    "time_slot_added": "Interval successfully added",
+    "create_time_slot_error": "Error creating time slot"
+  },
+  "masters_page": {
+    "select_master": "Select a master for {{serviceName}}",
+    "master_added_success": "Master successfully added",
+    "error_fetching_masters": "Error fetching masters",
+    "error_fetching_service": "Error fetching service"
+  },
+  "notifications": {
+    "master_added_success": "Master successfully added"
+  },
+  "adminPanel": "Admin Panel",
+  "addService": "Add Service",
+  "addMaster": "Add Master",
+  "timeSettings": "Time Settings",
+  "service_created_devprime": "Service was create "
+}

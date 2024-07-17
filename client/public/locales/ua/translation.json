@@ -1,0 +1,59 @@
+{
+  "Login": "Логін",
+  "select_service": "Виберіть послугу",
+  "next": "Далі",
+  "services": {
+    "Haircut": "Стрижка",
+    "Manicure": "Манікюр",
+    "Pedicure": "Педікюр",
+    "Massage": "Масаж"
+  },
+  "login": {
+    "title": "Вхід",
+    "username": "Ім'я користувача",
+    "password": "Пароль",
+    "login_button": "Увійти",
+    "invalid_credentials": "Неправильні дані"
+  },
+  "booking_page": {
+    "title": "Запис до майстра",
+    "customer_name": "Ім'я клієнта",
+    "customer_phone": "Телефон клієнта",
+    "date": "Дата",
+    "select_time": "Виберіть час",
+    "book_button": "Записатися",
+    "fill_all_fields": "Заповніть всі поля",
+    "loading_error": "Помилка завантаження доступних часових інтервалів",
+    "booking_error": "Помилка при створенні запису",
+    "no_time_slots": "Немає часових інтервалів"
+  },
+  "time_settings_form": {
+    "title": "Налаштування часових інтервалів",
+    "select_master": "Оберіть майстра",
+    "select_date": "Оберіть дату",
+    "start_time": "Початок",
+    "end_time": "Кінець",
+    "add_interval": "Додати інтервал",
+    "no_time_slots": "Немає доступних часових інтервалів для обраного майстра і дати",
+    "loading_masters_error": "Помилка завантаження майстрів",
+    "loading_time_slots_error": "Помилка отримання часових інтервалів",
+    "time_slot_added": "Інтервал успішно додано",
+    "create_time_slot_error": "Помилка створення часового інтервалу"
+  },
+  "masters_page": {
+    "select_master": "Оберіть майстра для {{serviceName}}",
+    "master_added_success": "Майстер успішно доданий",
+    "error_fetching_masters": "Помилка отримання списку майстрів",
+    "error_fetching_service": "Помилка отримання сервісу",
+    "back": "Назад"
+
+  },
+  "notifications": {
+    "master_added_success": "Майстер успішно доданий"
+  },
+  "adminPanel": "Адміністративна панель",
+  "addService": "Додати послугу",
+  "addMaster": "Додати майстра",
+  "timeSettings": "Налаштування часу",
+  "service_created_devprime": "Створено сервіс "
+}

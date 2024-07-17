@@ -1,30 +1,42 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Box } from '@mui/material';
+import { Button, TextField, Typography, Box, styled } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+const StyledPrimaryButton = styled(Button)({
+    backgroundColor: '#252525',
+    color: '#FFFFFF',
+    '&:hover': {
+        backgroundColor: '#1f1f1f',
+    },
+});
 
 const LoginForm = ({ onLogin }) => {
+    const { t } = useTranslation();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // Заменяем useHistory на useNavigate
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (username === 'admin' && password === 'admin') {
             onLogin();
-            navigate('/admin'); // Используем navigate для перехода на /admin
+            navigate('/admin');
         } else {
-            setError('Invalid credentials');
+            setError(t('login.invalid_credentials'));
         }
     };
 
     return (
         <Box sx={{ maxWidth: 400, mx: 'auto', mt: 4 }}>
-            <Typography variant="h4" gutterBottom>Login</Typography>
+            <Typography variant="h4" gutterBottom>
+                {t('login.title')}
+            </Typography>
             <form onSubmit={handleSubmit}>
                 <TextField
                     fullWidth
-                    label="Username"
+                    label={t('login.username')}
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     margin="normal"
@@ -34,7 +46,7 @@ const LoginForm = ({ onLogin }) => {
                 <TextField
                     fullWidth
                     type="password"
-                    label="Password"
+                    label={t('login.password')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     margin="normal"
@@ -43,7 +55,9 @@ const LoginForm = ({ onLogin }) => {
                 />
                 {error && <Typography color="error">{error}</Typography>}
                 <Box mt={2}>
-                    <Button type="submit" variant="contained" color="primary">Login</Button>
+                    <StyledPrimaryButton type="submit" variant="contained">
+                        {t('login.login_button')}
+                    </StyledPrimaryButton>
                 </Box>
             </form>
         </Box>

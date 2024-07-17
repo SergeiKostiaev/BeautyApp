@@ -1,64 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, TextField, Button, List, ListItem, ListItemText, Snackbar, Alert, MenuItem } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const TimeSettingsForm = () => {
+    const { t } = useTranslation();
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [timeSlots, setTimeSlots] = useState([]);
-    const [masters, setMasters] = useState([]); // Список мастеров
-    const [masterId, setMasterId] = useState(''); // Текущий ID мастера
+    const [masters, setMasters] = useState([]);
+    const [masterId, setMasterId] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
     useEffect(() => {
-        fetchMasters(); // Загрузить мастеров при монтировании компонента
+        fetchMasters();
     }, []);
-
-    useEffect(() => {
-        if (masterId) {
-            fetchTimeSlots();
-        }
-    }, [masterId]);
 
     const fetchMasters = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/masters');
             setMasters(response.data);
         } catch (error) {
-            console.error('Error fetching masters:', error);
-            setError('Ошибка загрузки мастеров');
+            console.error('Ошибка загрузки мастеров:', error);
+            setError(t('time_settings_form.loading_masters_error'));
         }
     };
 
     const fetchTimeSlots = async () => {
+        if (!masterId || !selectedDate) {
+            console.error('masterId или selectedDate не определены');
+            return;
+        }
+
         try {
-            const response = await axios.get(`http://localhost:5000/api/time-slots/${masterId}`);
-            console.log('Fetched time slots:', response.data);
+            const response = await axios.get(`http://localhost:5000/api/time-slots/master/${masterId}?date=${selectedDate}`);
+            console.log('Слоты времени успешно получены:', response.data);
             setTimeSlots(response.data);
         } catch (error) {
-            console.error('Error fetching time slots:', error);
-            setError('Ошибка загрузки временных интервалов');
+            console.error('Ошибка при получении слотов времени:', error);
+            setError(t('time_settings_form.loading_time_slots_error'));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const requestData = {
+            startTime,
+            endTime,
+            masterId,
+            date: selectedDate
+        };
+
         try {
-            const response = await axios.post('http://localhost:5000/api/time-slots', {
-                startTime,
-                endTime,
-                masterId // Include master ID
-            });
-            setTimeSlots([...timeSlots, response.data]);
+            const response = await axios.post('http://localhost:5000/api/time-slots', requestData);
+            const newTimeSlot = response.data;
+            setTimeSlots(prevTimeSlots => [...prevTimeSlots, newTimeSlot]);
             setStartTime('');
             setEndTime('');
-            setSuccess('Интервал успешно добавлен');
-            setError(null); // Clear any existing errors
+            setSuccess(t('time_settings_form.time_slot_added'));
+            setError(null);
         } catch (error) {
-            console.error('Error creating time slot:', error);
-            setError('Ошибка создания временного интервала');
-            setSuccess(null); // Clear success message on error
+            console.error('Ошибка создания временного интервала:', error);
+            if (error.response) {
+                console.error('Сообщение об ошибке сервера:', error.response.data.message);
+            }
+            setError(t('time_settings_form.create_time_slot_error'));
+            setSuccess(null);
         }
     };
 
@@ -67,32 +76,33 @@ const TimeSettingsForm = () => {
         setSuccess(null);
     };
 
-//     const addTimeSlot = async (startTime, endTime) => {
-//         try {
-//             const response = await axios.post('http://localhost:5000/api/time-slots', { startTime, endTime });
-//             return response.data;
-//         } catch (error) {
-//             console.error('Ошибка при добавлении временного интервала:', error);
-//             throw error;
-//         }
-//     };
-//
-// // Пример вызова функции для добавления временного интервала
-//     addTimeSlot('2024-06-27T10:00:00', '2024-06-27T11:00:00')
-//         .then(data => console.log('Добавлен временной интервал:', data))
-//         .catch(error => console.error('Ошибка:', error));
+    const handleMasterChange = (e) => {
+        const selectedMasterId = e.target.value;
+        setMasterId(selectedMasterId);
+        setSelectedDate(''); // Сбрасываем выбранную дату при изменении мастера
+    };
+
+    const handleDateChange = (e) => {
+        setSelectedDate(e.target.value);
+    };
+
+    useEffect(() => {
+        if (masterId && selectedDate) {
+            fetchTimeSlots();
+        }
+    }, [masterId, selectedDate]);
 
     return (
         <Container>
             <Typography variant="h4" component="h1" gutterBottom>
-                Настройка Временных Интервалов
+                {t('time_settings_form.title')}
             </Typography>
             <form onSubmit={handleSubmit}>
                 <TextField
                     select
-                    label="Выберите мастера"
+                    label={t('time_settings_form.select_master')}
                     value={masterId}
-                    onChange={(e) => setMasterId(e.target.value)}
+                    onChange={handleMasterChange}
                     fullWidth
                     margin="normal"
                     required
@@ -104,7 +114,19 @@ const TimeSettingsForm = () => {
                     ))}
                 </TextField>
                 <TextField
-                    label="Начало"
+                    label={t('time_settings_form.select_date')}
+                    type="date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    required
+                />
+                <TextField
+                    label={t('time_settings_form.start_time')}
                     type="time"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
@@ -114,12 +136,12 @@ const TimeSettingsForm = () => {
                         shrink: true,
                     }}
                     inputProps={{
-                        step: 300, // 5 minutes interval
+                        step: 300,
                     }}
                     required
                 />
                 <TextField
-                    label="Конец"
+                    label={t('time_settings_form.end_time')}
                     type="time"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
@@ -129,20 +151,26 @@ const TimeSettingsForm = () => {
                         shrink: true,
                     }}
                     inputProps={{
-                        step: 300, // 5 minutes interval
+                        step: 300,
                     }}
                     required
                 />
                 <Button type="submit" variant="contained" color="primary" fullWidth>
-                    Добавить интервал
+                    {t('time_settings_form.add_interval')}
                 </Button>
             </form>
             <List>
-                {timeSlots.map((slot) => (
-                    <ListItem key={slot._id}>
-                        <ListItemText primary={`${slot.startTime} - ${slot.endTime}`} />
+                {timeSlots.length === 0 ? (
+                    <ListItem>
+                        <ListItemText primary={t('time_settings_form.no_time_slots')} />
                     </ListItem>
-                ))}
+                ) : (
+                    timeSlots.map((slot) => (
+                        <ListItem key={slot._id}>
+                            <ListItemText primary={`${slot.startTime} - ${slot.endTime}`} />
+                        </ListItem>
+                    ))
+                )}
             </List>
             <Snackbar open={Boolean(error)} autoHideDuration={6000} onClose={handleCloseSnackbar}>
                 <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>

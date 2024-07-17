@@ -1,10 +1,27 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const masterSchema = new mongoose.Schema({
-    name: String,
-    serviceId: mongoose.Schema.Types.ObjectId,
+const masterSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    imageUrl: {
+        type: String,
+        default: ''
+    },
+    service: {
+        type: Schema.Types.ObjectId,
+        ref: 'Service', // Убедитесь, что 'Service' соответствует имени модели услуг
+        required: true
+    },
+    timeslots: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'TimeSlot'
+        }
+    ]
 });
 
-const Master = mongoose.models.Master || mongoose.model('Master', masterSchema);
-
-module.exports = Master;
+module.exports = mongoose.model('Master', masterSchema);

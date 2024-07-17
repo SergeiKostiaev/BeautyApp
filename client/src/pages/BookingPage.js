@@ -1,78 +1,108 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Container, TextField, Button, Typography, MenuItem } from '@mui/material';
+import { Container, TextField, Button, Typography, styled } from '@mui/material';
 import { useParams, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+
+const StyledButton = styled(Button)(({ theme }) => ({
+    position: 'fixed',
+    bottom: '10px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 'calc(100% - 20px)',
+    maxWidth: '500px',
+    backgroundColor: '#252525', // Добавлено свойство backgroundColor
+    color: '#FFFFFF', // Добавлено свойство color
+    '&:hover': {
+        backgroundColor: '#1f1f1f', // Цвет при наведении
+    },
+}));
 
 const BookingPage = () => {
-    const { serviceId } = useParams(); // Получаем serviceId из URL
+    const { t } = useTranslation();
+    const { serviceId } = useParams();
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [date, setDate] = useState('');
-    const [time, setTime] = useState('');
+    const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [bookingSuccess, setBookingSuccess] = useState(false);
-    const [timeSlots, setTimeSlots] = useState([]);
+    const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        // Загрузка доступных временных интервалов с сервера
-        const fetchTimeSlots = async () => {
-            try {
-                const response = await axios.get('http://localhost:5000/api/time-slots');
-                setTimeSlots(response.data);
-            } catch (error) {
-                console.error('Error fetching time slots:', error);
-            }
-        };
+        if (date) {
+            fetchAvailableTimeSlots();
+        }
+    }, [date, serviceId]);
 
-        fetchTimeSlots();
-    }, []);
+    const fetchAvailableTimeSlots = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:5000/api/time-slots?date=${date}&serviceId=${serviceId}`);
+            const timeSlotsWithAvailability = response.data.map(slot => ({
+                ...slot,
+                isAvailable: !slot.booked,
+            }));
+            // Фильтрация временных интервалов по выбранной дате
+            const filteredTimeSlots = timeSlotsWithAvailability.filter(slot => slot.date === date);
+            setAvailableTimeSlots(filteredTimeSlots);
+        } catch (error) {
+            console.error('Error fetching available time slots:', error);
+            setError(t('booking_page.loading_error'));
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // Функция для проверки формата ObjectId
-    function isValidObjectId(id) {
-        return /^[0-9a-fA-F]{24}$/.test(id);
-    }
-
-    // Функция для создания бронирования
     const createBooking = async (e) => {
-        e.preventDefault(); // Предотвращаем стандартное поведение отправки формы
-
-        // Проверяем, что serviceId не пустой и валидный ObjectId
-        if (!serviceId || !isValidObjectId(serviceId)) {
-            console.error('Invalid or empty serviceId:', serviceId);
+        e.preventDefault();
+        if (!customerName || !customerPhone || !date || !selectedTimeSlot) {
+            setError(t('booking_page.fill_all_fields'));
             return;
         }
 
         const bookingData = {
-            serviceId: serviceId,
-            customerName: customerName,
-            customerPhone: customerPhone,
-            date: date,
-            time: time
-            // Добавьте другие данные для бронирования по необходимости
+            serviceId,
+            customerName,
+            customerPhone,
+            date,
+            time: selectedTimeSlot.startTime,
         };
 
         try {
+            setLoading(true);
             const response = await axios.post('http://localhost:5000/api/bookings', bookingData);
             console.log('Booking created:', response.data);
-            // Устанавливаем флаг успешного бронирования
+
+            fetchAvailableTimeSlots();
+
             setBookingSuccess(true);
         } catch (error) {
             console.error('Error creating booking:', error);
+            setError(t('booking_page.booking_error'));
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Если бронирование успешно, переходим на страницу SuccessPage
+    const handleDateChange = useCallback((newDate) => {
+        setDate(newDate);
+        setAvailableTimeSlots([]); // Очищаем доступные временные интервалы при изменении даты
+    }, []);
+
     if (bookingSuccess) {
         return <Navigate to="/success" />;
     }
 
     return (
-        <Container>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Запись к мастеру
+        <Container style={{ paddingTop: '50px', paddingBottom: '70px' }}>
+            <Typography variant="h4" component="h1" align="center" style={{ marginBottom: '20px', fontSize: '25px', fontWeight: '600' }}>
+                {t('booking_page.title')}
             </Typography>
             <form onSubmit={createBooking}>
                 <TextField
-                    label="Имя клиента"
+                    label={t('booking_page.customer_name')}
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     fullWidth
@@ -80,7 +110,7 @@ const BookingPage = () => {
                     required
                 />
                 <TextField
-                    label="Телефон клиента"
+                    label={t('booking_page.customer_phone')}
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     fullWidth
@@ -88,10 +118,10 @@ const BookingPage = () => {
                     required
                 />
                 <TextField
-                    label="Дата"
+                    label={t('booking_page.date')}
                     type="date"
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    onChange={(e) => handleDateChange(e.target.value)}
                     fullWidth
                     margin="normal"
                     InputLabelProps={{
@@ -99,24 +129,42 @@ const BookingPage = () => {
                     }}
                     required
                 />
-                <TextField
-                    label="Время"
-                    select
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    fullWidth
-                    margin="normal"
-                    required
+                {date && (
+                    <div style={{ marginTop: '1rem' }}>
+                        {availableTimeSlots.length > 0 ? (
+                            availableTimeSlots.map((slot) => (
+                                <Button
+                                    key={slot._id}
+                                    variant="contained"
+                                    style={{
+                                        margin: '0.5rem',
+                                        backgroundColor: slot.isAvailable ? '#252525' : '#f50057',
+                                        color: 'white',
+                                        pointerEvents: slot.isAvailable ? 'auto' : 'none'
+                                    }}
+                                    onClick={() => slot.isAvailable && setSelectedTimeSlot(slot)}
+                                    disabled={!slot.isAvailable}
+                                >
+                                    {`${slot.startTime} - ${slot.endTime}`}
+                                </Button>
+                            ))
+                        ) : (
+                            <Typography variant="body2">{t('booking_page.no_time_slots')}</Typography>
+                        )}
+                    </div>
+                )}
+                <StyledButton
+                    type="submit"
+                    variant="contained"
+                    disabled={!selectedTimeSlot}
                 >
-                    {timeSlots.map((slot) => (
-                        <MenuItem key={slot._id} value={slot.startTime}>
-                            {slot.startTime} - {slot.endTime}
-                        </MenuItem>
-                    ))}
-                </TextField>
-                <Button type="submit" variant="contained" color="primary" fullWidth>
-                    Записаться
-                </Button>
+                    {t('booking_page.book_button')}
+                </StyledButton>
+                {error && (
+                    <Typography variant="body2" color="error" style={{ marginTop: '1rem' }}>
+                        {error}
+                    </Typography>
+                )}
             </form>
         </Container>
     );

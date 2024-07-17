@@ -35,13 +35,14 @@ const ServicesForm = () => {
             });
 
             console.log('Service added successfully:', response.data);
-            // Perform any additional actions after successful service addition
             setSuccess(true);
-
         } catch (error) {
             console.error('Error adding service:', error);
-            // Display user-friendly error message, if needed
-            setError('Error adding service. Please try again.');
+            if (error.response && error.response.data.message) {
+                setError(error.response.data.message);
+            } else {
+                setError('Error adding service. Please try again.');
+            }
         } finally {
             setIsLoading(false);
         }
