@@ -10,7 +10,7 @@ const mastersRouter = require('./routes/masters'); // Подключение р�
 const servicesRouter = require('./routes/services'); // Подключение роутера для услуг
 const Service = require('./models/service');
 const Master = require('./models/master');
-const Booking = require('./models/booking');
+const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
 const schedulesRouter = require('./routes/schedules');
 
