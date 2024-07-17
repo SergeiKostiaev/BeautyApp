@@ -8,8 +8,8 @@ const timeSlotsRouter = require('./routes/timeSlots');
 const mastersRouter = require('./routes/masters'); // Подключение роутера для мастеров
 const servicesRouter = require('./routes/services'); // Подключение роутера для услуг
 const schedulesRouter = require('./routes/schedules');
-const Service = require('./models/service');
-const Master = require('./models/master');
+const Service = require('./models/Service');
+const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
 
