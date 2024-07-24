@@ -174,11 +174,11 @@ app.post('/api/time-slots', async (req, res) => {
 });
 
 // Сервирование статических файлов из папки build
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // Обработка всех остальных запросов
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(PORT, () => {
