@@ -84,7 +84,7 @@ app.get('/api/timeslots/:masterId', async (req, res) => {
 app.post('/api/services/new', upload.single('image'), async (req, res) => {
     try {
         const { name } = req.body;
-        const imageUrl = req.file ? /uploads/${req.file.filename} : '';
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
         const newService = new Service({
             name,
             imageUrl
