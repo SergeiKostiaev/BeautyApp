@@ -11,7 +11,7 @@ const schedulesRouter = require('./routes/schedules');
 const Service = require('./models/Service');
 const Master = require('./models/Master');
 const Booking = require('./models/Booking');
-const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
+const TimeSlot = require('./models/TimeSlot'); // Исправлено название файла модели временных слотов
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,7 +33,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', { useNewUrlParser: 
     .catch((err) => {
         console.error('MongoDB connection error:', err);
     });
-
 
 // Middleware для обработки статических файлов
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -60,7 +59,7 @@ const upload = multer({ storage: storage });
 app.get('/api/schedules/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const schedule = await Schedule.find({ masterId }); // Пример использования Mongoose
+        const schedule = await Schedule.find({ masterId }); // Убедитесь, что Schedule импортирован правильно
         res.json(schedule);
     } catch (error) {
         console.error('Error fetching schedule:', error);
@@ -72,7 +71,7 @@ app.get('/api/schedules/:masterId', async (req, res) => {
 app.get('/api/timeslots/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const timeslots = await TimeSlot.find({ masterId }); // Пример использования Mongoose
+        const timeslots = await TimeSlot.find({ masterId }); // Убедитесь, что TimeSlot импортирован правильно
         res.json(timeslots);
     } catch (error) {
         console.error('Error fetching timeslots:', error);
