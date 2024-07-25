@@ -117,8 +117,9 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<ServicesPage />} />
                     <Route path="/masters/:serviceId" element={<MastersPage />} />
-                    <Route path="/booking/:serviceId" element={<BookingPage />} />
+                    <Route path="/booking/:masterId" element={<BookingPage />} />
                     <Route path="/success" element={<SuccessPage />} />
+
                     <Route
                         path="/admin/*"
                         element={

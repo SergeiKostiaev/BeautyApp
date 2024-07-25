@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, MenuItem, Container, Typography } from '@mui/material';
 import axios from 'axios';
+import { API_URL } from '../config.js';
 
 const MastersForm = () => {
     const [masterName, setMasterName] = useState('');
@@ -11,7 +12,7 @@ const MastersForm = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get('http://31.172.75.47:5000/api/services');
+                const response = await axios.get(`${API_URL}/api/services`);
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
@@ -34,7 +35,7 @@ const MastersForm = () => {
         formData.append('service', selectedService);
 
         try {
-            const response = await axios.post('http://31.172.75.47:5000/api/masters', formData, {
+            const response = await axios.post(`${API_URL}/api/masters`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

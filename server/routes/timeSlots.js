@@ -5,8 +5,7 @@ const TimeSlot = require('../models/timeSlot');
 // Получение временных интервалов по ID мастера и дате
 router.get('/master/:masterId', async (req, res) => {
     const { masterId } = req.params;
-    const { date } = req.query; // Assuming date is passed as a query parameter
-    console.log(`Received masterId: ${masterId}, date: ${date}`);
+    const { date } = req.query;
     try {
         const timeSlots = await TimeSlot.find({ masterId, date });
         if (!timeSlots || timeSlots.length === 0) {
@@ -18,6 +17,21 @@ router.get('/master/:masterId', async (req, res) => {
         res.status(500).json({ message: 'Ошибка при получении слотов времени', error });
     }
 });
+// Создание временных слотов для определенного мастера
+router.post('/master/:masterId', async (req, res) => {
+    const { masterId } = req.params;
+    const { startTime, endTime, date } = req.body;
+
+    try {
+        const newTimeSlot = new TimeSlot({ masterId, startTime, endTime, date });
+        await newTimeSlot.save();
+        res.status(201).json(newTimeSlot);
+    } catch (error) {
+        console.error('Ошибка создания временного интервала:', error);
+        res.status(400).json({ message: 'Ошибка создания временного интервала', error: error.message });
+    }
+});
+
 // Создание нового временного интервала
 router.post('/', async (req, res) => {
     const { startTime, endTime, masterId, date } = req.body;

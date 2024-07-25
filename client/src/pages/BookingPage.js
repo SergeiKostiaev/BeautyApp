@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Container, TextField, Button, Typography, styled } from '@mui/material';
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { API_URL } from '../config.js';
 
 const StyledButton = styled(Button)(({ theme }) => ({
     position: 'fixed',
@@ -11,16 +12,16 @@ const StyledButton = styled(Button)(({ theme }) => ({
     transform: 'translateX(-50%)',
     width: 'calc(100% - 20px)',
     maxWidth: '500px',
-    backgroundColor: '#252525', // Добавлено свойство backgroundColor
-    color: '#FFFFFF', // Добавлено свойство color
+    backgroundColor: '#252525',
+    color: '#FFFFFF',
     '&:hover': {
-        backgroundColor: '#1f1f1f', // Цвет при наведении
+        backgroundColor: '#1f1f1f',
     },
 }));
 
 const BookingPage = () => {
     const { t } = useTranslation();
-    const { serviceId } = useParams();
+    const { masterId } = useParams(); // Используйте masterId
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [date, setDate] = useState('');
@@ -31,22 +32,29 @@ const BookingPage = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        if (date) {
+        if (date && masterId) {
             fetchAvailableTimeSlots();
         }
-    }, [date, serviceId]);
+    }, [date, masterId]);
 
     const fetchAvailableTimeSlots = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots?date=${date}&serviceId=${serviceId}`);
-            const timeSlotsWithAvailability = response.data.map(slot => ({
-                ...slot,
-                isAvailable: !slot.booked,
-            }));
-            // Фильтрация временных интервалов по выбранной дате
-            const filteredTimeSlots = timeSlotsWithAvailability.filter(slot => slot.date === date);
-            setAvailableTimeSlots(filteredTimeSlots);
+            const response = await axios.get(`${API_URL}/api/time-slots/master/${masterId}`, {
+                params: { date },
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (Array.isArray(response.data)) {
+                const timeSlotsWithAvailability = response.data.map(slot => ({
+                    ...slot,
+                    isAvailable: !slot.booked,
+                }));
+                setAvailableTimeSlots(timeSlotsWithAvailability);
+            } else {
+                console.error('Unexpected response format:', response.data);
+                setError(t('booking_page.loading_error'));
+            }
         } catch (error) {
             console.error('Error fetching available time slots:', error);
             setError(t('booking_page.loading_error'));
@@ -63,7 +71,7 @@ const BookingPage = () => {
         }
 
         const bookingData = {
-            serviceId,
+            masterId,
             customerName,
             customerPhone,
             date,
@@ -72,11 +80,11 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            const response = await axios.post('http://31.172.75.47:5000/api/bookings', bookingData);
+            const response = await axios.post(`${API_URL}/api/bookings`, bookingData, {
+                headers: { 'Content-Type': 'application/json' },
+            });
             console.log('Booking created:', response.data);
-
             fetchAvailableTimeSlots();
-
             setBookingSuccess(true);
         } catch (error) {
             console.error('Error creating booking:', error);
@@ -88,7 +96,7 @@ const BookingPage = () => {
 
     const handleDateChange = useCallback((newDate) => {
         setDate(newDate);
-        setAvailableTimeSlots([]); // Очищаем доступные временные интервалы при изменении даты
+        setAvailableTimeSlots([]);
     }, []);
 
     if (bookingSuccess) {

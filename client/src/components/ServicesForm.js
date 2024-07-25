@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, CircularProgress, Typography, Alert } from '@mui/material';
 import axios from 'axios';
+import { API_URL } from '../config.js';
 
 const ServicesForm = () => {
     const [serviceName, setServiceName] = useState('');
@@ -28,7 +29,7 @@ const ServicesForm = () => {
         formData.append('image', serviceImage);
 
         try {
-            const response = await axios.post('http://31.172.75.47:5000/api/services/new', formData, {
+            const response = await axios.post(`${API_URL}/api/services/new`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

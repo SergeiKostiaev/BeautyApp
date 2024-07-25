@@ -3,6 +3,9 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
+const dotenv = require('dotenv');
+dotenv.config();
+
 const bookingsRouter = require('./routes/bookings');
 const timeSlotsRouter = require('./routes/timeSlots');
 const mastersRouter = require('./routes/masters'); // Подключение роутера для мастеров
@@ -17,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-    origin: 'http://31.172.75.47:3000', // ваш фронтенд URL
+    origin: process.env.FRONTEND_URL, // ваш фронтенд URL из переменной окружения
     optionsSuccessStatus: 200,
 };
 
@@ -33,7 +36,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', { useNewUrlParser: 
     .catch((err) => {
         console.error('MongoDB connection error:', err);
     });
-
 
 // Middleware для обработки статических файлов
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -69,13 +71,15 @@ app.get('/api/schedules/:masterId', async (req, res) => {
 });
 
 // Пример обработки /api/timeslots/:masterId
-app.get('/api/timeslots/:masterId', async (req, res) => {
+app.get('/api/time-slots/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const timeslots = await TimeSlot.find({ masterId }); // Пример использования Mongoose
+        const date = req.query.date; // Получаем дату из query параметра
+        // Ваш код для получения временных слотов по masterId и date
+        const timeslots = await TimeSlot.find({ masterId, date });
         res.json(timeslots);
     } catch (error) {
-        console.error('Error fetching timeslots:', error);
+        console.error('Error fetching time slots:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -175,11 +179,11 @@ app.post('/api/time-slots', async (req, res) => {
 });
 
 // Сервирование статических файлов из папки build
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // Обработка всех остальных запросов
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(PORT, () => {

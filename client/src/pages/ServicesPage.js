@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { List, ListItem, ListItemText, Avatar, Typography, styled, Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import logo from "../DevPrime.ru.png";
+import { API_URL } from '../config.js';
 
 const StyledListItem = styled(ListItem)(({ theme, selected }) => ({
     backgroundColor: selected ? '#252525' : '#D9D9D9',
@@ -75,7 +76,7 @@ const ServicesPage = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get('http://31.172.75.47:5000/api/services/');
+                const response = await axios.get(`${API_URL}/api/services/`);
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
@@ -108,7 +109,7 @@ const ServicesPage = () => {
                         selected={selectedService === service._id}
                     >
                         <StyledAvatarBox>
-                            <StyledAvatar src={`http://31.172.75.47:5000${service.imageUrl}`} />
+                            <StyledAvatar src={`${API_URL}${service.imageUrl}`} />
                         </StyledAvatarBox>
                         <StyledListItemText primary={t(`services.${service.name}`)} />
                     </StyledListItem>

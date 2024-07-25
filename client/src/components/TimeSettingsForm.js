@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Typography, TextField, Button, List, ListItem, ListItemText, Snackbar, Alert, MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { API_URL } from '../config.js';
 
 const TimeSettingsForm = () => {
     const { t } = useTranslation();
@@ -20,7 +21,7 @@ const TimeSettingsForm = () => {
 
     const fetchMasters = async () => {
         try {
-            const response = await axios.get('http://31.172.75.47:5000/api/masters');
+            const response = await axios.get(`${API_URL}/api/masters`);
             setMasters(response.data);
         } catch (error) {
             console.error('Ошибка загрузки мастеров:', error);
@@ -28,15 +29,9 @@ const TimeSettingsForm = () => {
         }
     };
 
-    const fetchTimeSlots = async () => {
-        if (!masterId || !selectedDate) {
-            console.error('masterId или selectedDate не определены');
-            return;
-        }
-
+    const fetchTimeSlots = async (masterId, date) => {
         try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}?date=${selectedDate}`);
-            console.log('Слоты времени успешно получены:', response.data);
+            const response = await axios.get(`${API_URL}/api/time-slots/master/${masterId}?date=${date}`);
             setTimeSlots(response.data);
         } catch (error) {
             console.error('Ошибка при получении слотов времени:', error);
@@ -46,6 +41,13 @@ const TimeSettingsForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Валидация на клиенте
+        if (!startTime || !endTime || !masterId || !selectedDate) {
+            setError('Все поля обязательны для заполнения.');
+            return;
+        }
+
         const requestData = {
             startTime,
             endTime,
@@ -53,8 +55,10 @@ const TimeSettingsForm = () => {
             date: selectedDate
         };
 
+        console.log('Данные, отправляемые на сервер:', requestData);
+
         try {
-            const response = await axios.post('http://31.172.75.47:5000/api/time-slots', requestData);
+            const response = await axios.post(`${API_URL}/api/time-slots`, requestData);
             const newTimeSlot = response.data;
             setTimeSlots(prevTimeSlots => [...prevTimeSlots, newTimeSlot]);
             setStartTime('');
@@ -80,6 +84,7 @@ const TimeSettingsForm = () => {
         const selectedMasterId = e.target.value;
         setMasterId(selectedMasterId);
         setSelectedDate(''); // Сбрасываем выбранную дату при изменении мастера
+        setTimeSlots([]); // Очищаем текущие временные интервалы
     };
 
     const handleDateChange = (e) => {
@@ -88,7 +93,9 @@ const TimeSettingsForm = () => {
 
     useEffect(() => {
         if (masterId && selectedDate) {
-            fetchTimeSlots();
+            fetchTimeSlots(masterId, selectedDate);
+        } else {
+            setTimeSlots([]); // Очищаем временные интервалы, если мастер или дата не выбраны
         }
     }, [masterId, selectedDate]);
 
