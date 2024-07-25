@@ -40,7 +40,7 @@ const BookingPage = () => {
     const fetchAvailableTimeSlots = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`${API_URL}/api/time-slots/master/${masterId}`, {
+            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}`, {
                 params: { date },
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -80,7 +80,7 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            const response = await axios.post(`${API_URL}/api/bookings`, bookingData, {
+            const response = await axios.post(`http://31.172.75.47:5000/api/bookings`, bookingData, {
                 headers: { 'Content-Type': 'application/json' },
             });
             console.log('Booking created:', response.data);

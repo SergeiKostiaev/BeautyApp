@@ -86,7 +86,7 @@ const MastersPage = () => {
     useEffect(() => {
         const fetchMasters = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/masters/by-service/${serviceId}`);
+                const response = await axios.get(`http://31.172.75.47:5000/api/masters/by-service/${serviceId}`);
                 setMasters(response.data);
             } catch (error) {
                 console.error('Error fetching masters:', error);
@@ -95,7 +95,7 @@ const MastersPage = () => {
 
         const fetchServiceName = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/services/${serviceId}`);
+                const response = await axios.get(`http://31.172.75.47:5000/api/services/${serviceId}`);
                 setServiceName(response.data.name);
             } catch (error) {
                 console.error('Error fetching service:', error);

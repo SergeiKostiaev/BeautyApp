@@ -12,7 +12,7 @@ const MastersForm = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/services`);
+                const response = await axios.get(`http://31.172.75.47:5000/api/services`);
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
@@ -35,7 +35,7 @@ const MastersForm = () => {
         formData.append('service', selectedService);
 
         try {
-            const response = await axios.post(`${API_URL}/api/masters`, formData, {
+            const response = await axios.post(`http://31.172.75.47:5000/api/masters`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

@@ -20,7 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-    origin: process.env.FRONTEND_URL, // ваш фронтенд URL из переменной окружения
+    origin: 'http://31.172.75.47:3000', // ваш фронтенд URL из переменной окружения
     optionsSuccessStatus: 200,
 };
 

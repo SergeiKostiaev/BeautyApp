@@ -76,7 +76,7 @@ const ServicesPage = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/services/`);
+                const response = await axios.get(`http://31.172.75.47:5000/api/services/`);
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
