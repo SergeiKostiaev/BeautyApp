@@ -21,6 +21,8 @@ const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
     origin: 'http://31.172.75.47:3000', // ваш фронтенд URL из переменной окружения
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
 };
 
