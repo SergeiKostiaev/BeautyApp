@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Container, TextField, Button, Typography, styled } from '@mui/material';
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { API_URL } from '../config.js';
+import { createBooking } from '../components/bookingService.js'; // Импортируем функцию из сервиса
 
 const StyledButton = styled(Button)(({ theme }) => ({
     position: 'fixed',
@@ -21,7 +21,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 
 const BookingPage = () => {
     const { t } = useTranslation();
-    const { masterId } = useParams(); // Используйте masterId
+    const { masterId } = useParams();
     const [customerName, setCustomerName] = useState('');
     const [customerPhone, setCustomerPhone] = useState('');
     const [date, setDate] = useState('');
@@ -42,14 +42,17 @@ const BookingPage = () => {
         try {
             const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}`, {
                 params: { date },
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
             });
+
+            console.log('API Response:', response.data);
 
             if (Array.isArray(response.data)) {
                 const timeSlotsWithAvailability = response.data.map(slot => ({
                     ...slot,
                     isAvailable: !slot.booked,
                 }));
+                console.log('Processed time slots:', timeSlotsWithAvailability);
                 setAvailableTimeSlots(timeSlotsWithAvailability);
             } else {
                 console.error('Unexpected response format:', response.data);
@@ -63,7 +66,12 @@ const BookingPage = () => {
         }
     };
 
-    const createBooking = async (e) => {
+    const handleDateChange = useCallback((newDate) => {
+        setDate(newDate);
+        setAvailableTimeSlots([]);
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!customerName || !customerPhone || !date || !selectedTimeSlot) {
             setError(t('booking_page.fill_all_fields'));
@@ -80,11 +88,9 @@ const BookingPage = () => {
 
         try {
             setLoading(true);
-            const response = await axios.post(`http://31.172.75.47:5000/api/bookings`, bookingData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            console.log('Booking created:', response.data);
-            fetchAvailableTimeSlots();
+            const response = await createBooking(bookingData);
+            console.log('Booking created:', response);
+            await fetchAvailableTimeSlots();
             setBookingSuccess(true);
         } catch (error) {
             console.error('Error creating booking:', error);
@@ -93,11 +99,6 @@ const BookingPage = () => {
             setLoading(false);
         }
     };
-
-    const handleDateChange = useCallback((newDate) => {
-        setDate(newDate);
-        setAvailableTimeSlots([]);
-    }, []);
 
     if (bookingSuccess) {
         return <Navigate to="/success" />;
@@ -108,7 +109,7 @@ const BookingPage = () => {
             <Typography variant="h4" component="h1" align="center" style={{ marginBottom: '20px', fontSize: '25px', fontWeight: '600' }}>
                 {t('booking_page.title')}
             </Typography>
-            <form onSubmit={createBooking}>
+            <form onSubmit={handleSubmit}>
                 <TextField
                     label={t('booking_page.customer_name')}
                     value={customerName}

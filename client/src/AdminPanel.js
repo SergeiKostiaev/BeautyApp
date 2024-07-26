@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next'; // Импорт хука для 
 import ServicesForm from './components/ServicesForm.js';
 import MastersForm from './components/MastersForm.js';
 import TimeSettingsForm from './components/TimeSettingsForm.js';
+import DeleteMasterForm from './components/DeleteMasterForm.js';
+import DeleteServiceForm from './components/DeleteServiceForm.js';
 
 const StyledListItem = styled(ListItem)(({ theme }) => ({
     backgroundColor: '#D9D9D9',
@@ -58,12 +60,28 @@ const AdminPanel = () => {
                             </StyledButton>
                         </Link>
                     </StyledListItem>
+                    <StyledListItem component="li" disablePadding>
+                        <Link to="/admin/masters/delete" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                            <StyledButton variant="contained" color="primary" fullWidth>
+                                {t('deleteMaster')}
+                            </StyledButton>
+                        </Link>
+                    </StyledListItem>
+                    <StyledListItem component="li" disablePadding>
+                        <Link to="/admin/services/delete" style={{ textDecoration: 'none', color: 'inherit', width: '100%' }}>
+                            <StyledButton variant="contained" color="primary" fullWidth>
+                                {t('deleteService')}
+                            </StyledButton>
+                        </Link>
+                    </StyledListItem>
                 </List>
             </nav>
             <Routes>
                 <Route path="/admin/services/new" element={<ServicesForm />} />
                 <Route path="/admin/masters/new" element={<MastersForm />} />
                 <Route path="/admin/time-settings" element={<TimeSettingsForm />} />
+                <Route path="/admin/masters/delete" element={<DeleteMasterForm />} />
+                <Route path="/admin/services/delete" element={<DeleteServiceForm />} />
             </Routes>
         </Box>
     );

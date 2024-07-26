@@ -5,10 +5,10 @@ const SuccessPage = () => {
     return (
         <Container>
             <Typography variant="h4" component="h1" gutterBottom>
-                Успешное бронирование!
+                Вы записались к мастеру!
             </Typography>
             <Typography variant="body1">
-                Ваше бронирование успешно создано. Мы скоро свяжемся с вами для подтверждения.
+                Ваша запись успешно создана. Мы скоро свяжемся с вами для подтверждения.
             </Typography>
             {/* Можно добавить дополнительную информацию или ссылки */}
         </Container>

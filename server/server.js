@@ -15,14 +15,16 @@ const Service = require('./models/Service');
 const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
+const sendToTelegram = require('./Telegram');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
     origin: 'http://31.172.75.47:3000', // ваш фронтенд URL из переменной окружения
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    // allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
 };
 
@@ -125,60 +127,120 @@ app.get('/api/services/:id', async (req, res) => {
 
 // Маршрут для создания бронирования
 app.post('/api/bookings', async (req, res) => {
+    const { masterId, customerName, customerPhone, date, time } = req.body;
+
     try {
-        const { masterId, serviceId, date, time, customerName, customerPhone } = req.body;
-        const booking = new Booking({
-            masterId,
-            serviceId,
-            date,
-            time,
-            customerName,
-            customerPhone
-        });
-        await booking.save();
-        res.status(201).send(booking);
+        const newBooking = new Booking({ masterId, customerName, customerPhone, date, time });
+        await newBooking.save();
+
+        // Отправка уведомления в Telegram с кнопкой отмены
+        await sendToTelegram(`New booking:\nName: ${customerName}\nPhone: ${customerPhone}\nDate: ${date}\nTime: ${time}`, newBooking._id);
+
+        res.status(201).json(newBooking);
     } catch (error) {
-        console.error('Ошибка при создании бронирования:', error);
-        res.status(500).send(error);
+        console.error('Error creating booking:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 // Обработка POST запроса для создания временного слота
 app.post('/api/time-slots', async (req, res) => {
-    const { startTime, endTime, masterId, serviceId } = req.body;
-
     try {
-        // Проверка наличия всех обязательных полей
-        if (!startTime || !endTime || !masterId || !serviceId) {
-            return res.status(400).json({ message: 'Отсутствуют обязательные поля' });
-        }
+        const { startTime, endTime, masterId, date } = req.body;
 
-        // Поиск мастера по ID
-        const master = await Master.findById(masterId);
-        if (!master) {
-            return res.status(404).json({ message: 'Мастер не найден' });
-        }
+        // Создайте новый временной интервал
+        const newTimeSlot = new TimeSlot({
+            startTime,
+            endTime,
+            masterId,
+            date,
+            available: true, // По умолчанию интервал доступен
+        });
 
-        // Поиск услуги по ID
-        const service = await Service.findById(serviceId);
-        if (!service) {
-            return res.status(404).json({ message: 'Услуга не найдена' });
-        }
-
-        // Создание нового временного слота
-        const newTimeSlot = new TimeSlot({ startTime, endTime, masterId });
         await newTimeSlot.save();
-
-        // Добавление временного слота в массив timeslots мастера
-        master.timeslots.push(newTimeSlot);
-        await master.save();
-
         res.status(201).json(newTimeSlot);
     } catch (error) {
-        console.error('Ошибка при создании временного слота:', error);
-        res.status(500).json({ message: 'Ошибка сервера' });
+        console.error('Ошибка при создании временного интервала:', error);
+        res.status(500).json({ message: 'Ошибка при создании временного интервала' });
     }
 });
+
+// Маршрут для отправки сообщений в Telegram
+app.post('/api/send-telegram', async (req, res) => {
+    try {
+        const { message } = req.body;
+        await sendToTelegram(message); // Убедитесь, что `sendToTelegram` правильно импортирована
+        res.status(200).send('Message sent to Telegram');
+    } catch (error) {
+        console.error('Error sending message to Telegram:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+app.delete('/api/masters/:id', async (req, res) => {
+    try {
+        const masterId = req.params.id;
+
+        // Убедитесь, что идентификатор корректен
+        if (!masterId) {
+            return res.status(400).json({ message: 'Invalid master ID' });
+        }
+
+        // Удалите мастера из базы данных
+        const result = await Master.findByIdAndDelete(masterId);
+
+        if (!result) {
+            return res.status(404).json({ message: 'Master not found' });
+        }
+
+        res.status(200).json({ message: 'Master deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting master:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Маршрут для удаления сервиса
+app.delete('/api/services/:id', async (req, res) => {
+    const serviceId = req.params.id;
+
+    try {
+        const result = await Service.findByIdAndDelete(serviceId);
+        if (!result) {
+            return res.status(404).json({ message: 'Service not found' });
+        }
+        res.status(200).json({ message: 'Service deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting service:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Определение маршрута
+app.get('/api/time-slots/master/:masterId', async (req, res) => {
+    const { masterId } = req.params;
+    const { date } = req.query;
+
+    try {
+        const timeSlots = await TimeSlot.find({ masterId, date });
+        const bookings = await Booking.find({ masterId, date });
+
+        const updatedTimeSlots = timeSlots.map(slot => {
+            const isBooked = bookings.some(booking => booking.time === slot.startTime);
+            return {
+                ...slot.toObject(),
+                available: !isBooked,
+            };
+        });
+
+        res.json(updatedTimeSlots);
+    } catch (error) {
+        console.error('Error fetching time slots:', error);
+        res.status(500).send('Server error');
+    }
+});
+
 
 // Сервирование статических файлов из папки build
 app.use(express.static(path.join(__dirname, '../client/build')));

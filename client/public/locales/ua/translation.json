@@ -55,5 +55,12 @@
   "addService": "Додати послугу",
   "addMaster": "Додати майстра",
   "timeSettings": "Налаштування часу",
-  "service_created_devprime": "Створено сервіс "
+  "service_created_devprime": "Створено сервіс ",
+  "adminPanel": "Адміністративна панель",
+  "addService": "Додати послугу",
+  "addMaster": "Додати майстра",
+  "timeSettings": "Налаштування часу",
+  "deleteMaster": "Видалити майстра",
+  "deleteService": "Видалити послугу",
+  "delete": "Видалити"
 }

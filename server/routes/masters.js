@@ -68,19 +68,25 @@ router.patch('/:id', async (req, res) => {
 });
 
 // Удаление мастера
-router.delete('/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deletedMaster = await Master.findByIdAndRemove(id);
+// Удаление мастера
+router.delete('/masters/:id', async (req, res) => {
+    const masterId = req.params.id;
 
-        if (!deletedMaster) {
-            return res.status(404).json({ message: 'Мастер не найден' });
+    if (!masterId) {
+        return res.status(400).json({ message: 'Invalid master ID' });
+    }
+
+    try {
+        const result = await Master.findByIdAndDelete(masterId);
+
+        if (!result) {
+            return res.status(404).json({ message: 'Master not found' });
         }
 
-        res.json({ message: 'Мастер удален' });
-    } catch (err) {
-        console.error('Ошибка при удалении мастера:', err);
-        res.status(500).json({ message: err.message });
+        res.status(200).json({ message: 'Master deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting master:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { List, ListItem, ListItemText, Avatar, Typography, styled, Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import logo from "../DevPrime.ru.png";
-import { API_URL } from '../config.js';
+// import { API_URL } from '../config.js';
 
 const StyledListItem = styled(ListItem)(({ theme, selected }) => ({
     backgroundColor: selected ? '#252525' : '#D9D9D9',
@@ -17,7 +17,7 @@ const StyledListItem = styled(ListItem)(({ theme, selected }) => ({
     width: '100%',
     cursor: 'pointer',
     border: selected ? '2px solid #252525' : 'none',
-    overflow: 'hidden', // обрезаем изображение, если оно не помещается
+    overflow: 'hidden',
 }));
 
 const StyledAvatarBox = styled(Box)(({ theme }) => ({
@@ -31,7 +31,7 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: '0', // чтобы аватарка внутри была квадратной
+    borderRadius: '0',
 }));
 
 const StyledListItemText = styled(ListItemText)(({ theme }) => ({
@@ -49,10 +49,10 @@ const FixedButton = styled(Button)(({ theme }) => ({
     transform: 'translateX(-50%)',
     width: 'calc(100% - 20px)',
     maxWidth: '500px',
-    backgroundColor: '#252525', // Добавлено свойство backgroundColor
-    color: '#FFFFFF', // Добавлено свойство color
+    backgroundColor: '#252525',
+    color: '#FFFFFF',
     '&:hover': {
-        backgroundColor: '#1f1f1f', // Цвет при наведении
+        backgroundColor: '#7b1fa2',
     },
 }));
 

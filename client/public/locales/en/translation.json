@@ -53,5 +53,12 @@
   "addService": "Add Service",
   "addMaster": "Add Master",
   "timeSettings": "Time Settings",
-  "service_created_devprime": "Service was create "
+  "service_created_devprime": "Service was create ",
+  "adminPanel": "Admin Panel",
+  "addService": "Add Service",
+  "addMaster": "Add Master",
+  "timeSettings": "Time Settings",
+  "deleteMaster": "Delete Master",
+  "deleteService": "Delete Service",
+  "delete": "Delete"
 }

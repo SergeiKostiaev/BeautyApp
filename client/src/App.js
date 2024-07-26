@@ -12,6 +12,8 @@ import Login from './components/Login.js';
 import TimeSettingsForm from './components/TimeSettingsForm.js';
 import ServicesForm from './components/ServicesForm.js';
 import MastersForm from './components/MastersForm.js';
+import DeleteMaster from './components/DeleteMasterForm.js';
+import DeleteService from './components/DeleteServiceForm.js';
 import logo from './DevPrimeClients.png';
 import ProtectedRoute from './ProtectedRoute.js';
 import './i18n.js';
@@ -57,63 +59,65 @@ const App = () => {
     };
 
     const handleLogoClick = () => {
-        setMenuAnchorEl(null); // Закрыть меню при клике на логотип
-        setAnchorEl(null); // Закрыть языковое меню при клике на логотип
+        setMenuAnchorEl(null);
+        setAnchorEl(null);
     };
 
     return (
         <Router>
             <CssBaseline />
-            <AppBar position="static">
-                <Toolbar style={{ backgroundColor: '#252525' }}>
-                    <Typography variant="h6" style={{ flexGrow: 1 }}>
+            <AppBar position="fixed" style={{ top: 0, left: 0, right: 0, zIndex: 1200 }}>
+                <Toolbar style={{ backgroundColor: '#252525', display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="h6">
                         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }} onClick={handleLogoClick}>
                             <img src={logo} alt="Logo" style={{ width: '110px', height: '12px', marginRight: '10px' }} />
                         </Link>
                     </Typography>
-                    <IconButton color="inherit" onClick={handleMenuClick}>
-                        <FaBars />
-                    </IconButton>
-                    <Menu
-                        anchorEl={menuAnchorEl}
-                        keepMounted
-                        open={Boolean(menuAnchorEl)}
-                        onClose={handleMenuClose}
-                    >
-                        <MenuItem component={Link} to="/" onClick={handleMenuClose} style={{ color: '#252525' }}>
-                            {t('select_service')}
-                        </MenuItem>
-                        {!isAdminLoggedIn && (
-                            <MenuItem component={Link} to="/login" onClick={handleMenuClose} style={{ color: '#252525' }}>
-                                {t('Login')}
+                    <div>
+                        <IconButton color="inherit" onClick={handleMenuClick}>
+                            <FaBars />
+                        </IconButton>
+                        <Menu
+                            anchorEl={menuAnchorEl}
+                            keepMounted
+                            open={Boolean(menuAnchorEl)}
+                            onClose={handleMenuClose}
+                        >
+                            <MenuItem component={Link} to="/" onClick={handleMenuClose} style={{ color: '#252525' }}>
+                                {t('select_service')}
                             </MenuItem>
-                        )}
-                        {isAdminLoggedIn && (
-                            <MenuItem component={Link} to="/admin" onClick={handleMenuClose} style={{ color: '#252525' }}>
-                                {t('Admin Panel')}
-                            </MenuItem>
-                        )}
-                        {isAdminLoggedIn && (
-                            <MenuItem onClick={() => { handleAdminLogout(); handleMenuClose(); }} style={{ color: '#252525' }}>
-                                {t('Logout')}
-                            </MenuItem>
-                        )}
-                    </Menu>
-                    <Button color="inherit" onClick={handleLanguageClick} style={{ color: '#FFFFFF' }}>
-                        {i18n.language === 'ua' ? 'UA' : 'EN'}
-                    </Button>
-                    <Menu
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={() => setAnchorEl(null)}
-                    >
-                        <MenuItem onClick={() => handleLanguageClose('en')}>English</MenuItem>
-                        <MenuItem onClick={() => handleLanguageClose('ua')}>Українська</MenuItem>
-                    </Menu>
+                            {!isAdminLoggedIn && (
+                                <MenuItem component={Link} to="/login" onClick={handleMenuClose} style={{ color: '#252525' }}>
+                                    {t('Login')}
+                                </MenuItem>
+                            )}
+                            {isAdminLoggedIn && (
+                                <MenuItem component={Link} to="/admin" onClick={handleMenuClose} style={{ color: '#252525' }}>
+                                    {t('Admin Panel')}
+                                </MenuItem>
+                            )}
+                            {isAdminLoggedIn && (
+                                <MenuItem onClick={() => { handleAdminLogout(); handleMenuClose(); }} style={{ color: '#252525' }}>
+                                    {t('Logout')}
+                                </MenuItem>
+                            )}
+                        </Menu>
+                        <Button color="inherit" onClick={handleLanguageClick} style={{ color: '#FFFFFF' }}>
+                            {i18n.language === 'ua' ? 'UA' : 'EN'}
+                        </Button>
+                        <Menu
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={() => setAnchorEl(null)}
+                        >
+                            <MenuItem onClick={() => handleLanguageClose('en')}>English</MenuItem>
+                            <MenuItem onClick={() => handleLanguageClose('ua')}>Українська</MenuItem>
+                        </Menu>
+                    </div>
                 </Toolbar>
             </AppBar>
-            <Container>
+            <Container style={{ marginTop: '80px', paddingBottom: '50px' }}>
                 <Routes>
                     <Route path="/" element={<ServicesPage />} />
                     <Route path="/masters/:serviceId" element={<MastersPage />} />
@@ -150,6 +154,22 @@ const App = () => {
                         element={
                             <ProtectedRoute isLoggedIn={isAdminLoggedIn}>
                                 <MastersForm />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/masters/delete"
+                        element={
+                            <ProtectedRoute isLoggedIn={isAdminLoggedIn}>
+                                <DeleteMaster />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin/services/delete"
+                        element={
+                            <ProtectedRoute isLoggedIn={isAdminLoggedIn}>
+                                <DeleteService />
                             </ProtectedRoute>
                         }
                     />

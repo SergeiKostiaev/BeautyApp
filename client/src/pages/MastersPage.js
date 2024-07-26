@@ -49,7 +49,7 @@ const FixedButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#252525',
     color: '#FFFFFF',
     '&:hover': {
-        backgroundColor: theme.palette.primary.dark,
+        backgroundColor: '#7b1fa2',
     }
 }));
 
@@ -59,8 +59,8 @@ const FixedOutlinedButton = styled(Button)(({ theme }) => ({
     borderColor: '#252525',
     color: '#252525',
     '&:hover': {
-        borderColor: theme.palette.primary.dark,
-        color: '#FFFFFF',
+        borderColor: '#7b1fa2',
+        color: '#7b1fa2',
     },
 }));
 

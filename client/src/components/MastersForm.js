@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, MenuItem, Container, Typography } from '@mui/material';
+import { TextField, Button, MenuItem, Container, Typography, Alert } from '@mui/material';
 import axios from 'axios';
-import { API_URL } from '../config.js';
+// import { API_URL } from '../config.js';
 
 const MastersForm = () => {
     const [masterName, setMasterName] = useState('');
     const [masterImage, setMasterImage] = useState(null);
     const [services, setServices] = useState([]);
     const [selectedService, setSelectedService] = useState('');
+    const [error, setError] = useState(null); // Состояние для ошибки
+    const [success, setSuccess] = useState(null); // Состояние для успешного создания
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -16,6 +18,7 @@ const MastersForm = () => {
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
+                setError('Ошибка при загрузке услуг');
             }
         };
 
@@ -41,8 +44,15 @@ const MastersForm = () => {
                 },
             });
             console.log('Мастер успешно создан:', response.data);
+            setSuccess('Мастер успешно создан!'); // Сообщение об успешном создании
+            setError(null); // Очистите ошибку
+            setMasterName(''); // Очистите форму
+            setMasterImage(null);
+            setSelectedService('');
         } catch (error) {
             console.error('Ошибка при создании мастера:', error);
+            setError(`Ошибка при создании мастера: ${error.response ? error.response.data.message : error.message}`); // Сообщение об ошибке
+            setSuccess(null); // Очистите сообщение об успехе
         }
     };
 
@@ -79,6 +89,16 @@ const MastersForm = () => {
                 <Button type="submit" variant="contained" color="primary">
                     Добавить мастера
                 </Button>
+                {error && (
+                    <Alert severity="error" style={{ marginTop: 20 }}>
+                        {error}
+                    </Alert>
+                )}
+                {success && (
+                    <Alert severity="success" style={{ marginTop: 20 }}>
+                        {success}
+                    </Alert>
+                )}
             </form>
         </Container>
     );
