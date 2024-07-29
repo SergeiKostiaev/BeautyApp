@@ -176,6 +176,23 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
+app.post('/api/telegram/webhook', (req, res) => {
+    const { message } = req.body;
+
+    if (message) {
+        const bookingId = message.text.match(/cancel_(\d+)/);
+        if (bookingId) {
+            // Отмените запись в вашей системе
+            sendToTelegram('Запись отменена', bookingId[1]);
+            res.send('OK');
+        } else {
+            res.send('Invalid request');
+        }
+    } else {
+        res.send('No message');
+    }
+});
+
 // Маршрут для удаления мастера
 app.delete('/api/masters/:id', async (req, res) => {
     try {
