@@ -1,9 +1,10 @@
-const fetch = require('node-fetch');
-const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-const chatId = '414951154';
-const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
-
+// server/Telegram.js
 const sendToTelegram = async (message, bookingId) => {
+    const { default: fetch } = await import('node-fetch');
+    const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+    const chatId = '414951154';
+    const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+
     try {
         const response = await fetch(telegramUrl, {
             method: 'POST',
@@ -11,6 +12,16 @@ const sendToTelegram = async (message, bookingId) => {
                 chat_id: chatId,
                 text: `${message}\n\nBooking ID: ${bookingId}`,
                 parse_mode: 'HTML',
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            {
+                                text: 'Отменить запись',
+                                callback_data: `cancel_${bookingId}`
+                            }
+                        ]
+                    ]
+                }
             }),
             headers: { 'Content-Type': 'application/json' },
         });

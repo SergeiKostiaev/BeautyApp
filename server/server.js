@@ -1,3 +1,4 @@
+// server/server.js
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -16,15 +17,13 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
 const sendToTelegram = require('./Telegram');
-
+const cancelBookingById = require('./cancelBookingById'); // Подключение функции отмены бронирования
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
     origin: 'http://31.172.75.47:3000', // ваш фронтенд URL из переменной окружения
-    // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    // allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200,
 };
 
@@ -177,7 +176,7 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
-
+// Маршрут для удаления мастера
 app.delete('/api/masters/:id', async (req, res) => {
     try {
         const masterId = req.params.id;
@@ -217,7 +216,36 @@ app.delete('/api/services/:id', async (req, res) => {
     }
 });
 
-// Определение маршрута
+// Обработка запросов для отмены бронирования через Telegram
+app.post(`/api/telegram/${process.env.TELEGRAM_TOKEN}`, async (req, res) => {
+    const { callback_query } = req.body;
+
+    if (callback_query && callback_query.data) {
+        const bookingId = callback_query.data.split('_')[1];
+
+        try {
+            await cancelBookingById(bookingId);
+            const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
+            await fetch(telegramUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    chat_id: callback_query.message.chat.id,
+                    text: `Booking ${bookingId} has been successfully canceled.`,
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            res.status(200).send('Booking canceled');
+        } catch (error) {
+            console.error('Error processing callback query:', error);
+            res.status(500).send('Internal server error');
+        }
+    } else {
+        res.status(400).send('Bad request');
+    }
+});
+
+// Определение маршрута для получения временных слотов мастера
 app.get('/api/time-slots/master/:masterId', async (req, res) => {
     const { masterId } = req.params;
     const { date } = req.query;
@@ -240,7 +268,6 @@ app.get('/api/time-slots/master/:masterId', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
-
 
 // Сервирование статических файлов из папки build
 app.use(express.static(path.join(__dirname, '../client/build')));

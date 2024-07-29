@@ -8,6 +8,7 @@ const bookingSchema = new mongoose.Schema({
     customerName: String,
     customerPhone: String,
     isCancelled: { type: Boolean, default: false },
+    booked: { type: Boolean, default: true }
 });
 
 const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
