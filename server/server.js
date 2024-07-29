@@ -177,14 +177,21 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 app.post('/api/telegram/webhook', (req, res) => {
+    console.log('Received webhook:', req.body);
+
     const { message } = req.body;
 
     if (message) {
         const bookingId = message.text.match(/cancel_(\d+)/);
         if (bookingId) {
             // Отмените запись в вашей системе
-            sendToTelegram('Запись отменена', bookingId[1]);
-            res.send('OK');
+            cancelBookingById(bookingId[1]).then(() => {
+                sendToTelegram('Запись отменена', bookingId[1]);
+                res.send('OK');
+            }).catch(error => {
+                console.error('Error canceling booking:', error);
+                res.status(500).send('Internal Server Error');
+            });
         } else {
             res.send('Invalid request');
         }
