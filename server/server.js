@@ -156,21 +156,25 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 app.post('/webhook', async (req, res) => {
+    console.log('Received webhook update:', req.body);
+
     const update = req.body;
-    console.log('Received webhook update:', JSON.stringify(update, null, 2));
 
     if (update.callback_query) {
         const callbackData = update.callback_query.data;
-        const bookingId = callbackData.split('_')[1];
-        console.log('Received callback query with bookingId:', bookingId);
+        const [action, bookingId] = callbackData.split('_'); // Извлекаем bookingId
 
-        if (!bookingId) {
-            console.error('Invalid bookingId extracted from callback data');
-            return res.status(400).send('Invalid bookingId');
+        if (action !== 'cancel' || !bookingId) {
+            console.error('Invalid action or missing bookingId');
+            res.status(400).send('Invalid request');
+            return;
         }
 
         try {
-            await cancelBookingById(bookingId);
+            console.log('Canceling booking with ID:', bookingId);
+            await cancelBookingById(bookingId); // Функция отмены бронирования
+
+            // Ответ на callback_query
             await fetch(`${telegramUrl}/answerCallbackQuery`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -181,13 +185,13 @@ app.post('/webhook', async (req, res) => {
                 headers: { 'Content-Type': 'application/json' },
             });
 
-            res.send('Booking canceled and response sent to Telegram');
+            res.status(200).send('Booking canceled and response sent to Telegram');
         } catch (error) {
             console.error('Error processing callback query:', error);
             res.status(500).send('Error processing request');
         }
     } else {
-        res.send('Not a callback query');
+        res.status(400).send('Not a callback query');
     }
 });
 
