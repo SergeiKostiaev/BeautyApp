@@ -18,7 +18,8 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
-const cancelBookingById = require('./cancelBookingById');
+// const cancelBookingById = require('./cancelBookingById');
+const { cancelBooking } = require('./cancelBookingById');
 const createBooking = require('./routes/bookingController');
 
 const app = express();
