@@ -19,6 +19,7 @@ const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
 const cancelBookingById = require('./cancelBookingById');
+const createBooking = require('./routes/bookingController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -160,17 +161,17 @@ app.post('/webhook', async (req, res) => {
 
     if (update.callback_query) {
         const callbackData = update.callback_query.data;
-        const [action, bookingId] = callbackData.split('_'); // Извлекаем _id
+        const [action, bookingId] = callbackData.split('_'); // Извлечение _id
 
-        if (action !== 'cancel' || !bookingId) {
-            console.error('Invalid action or missing bookingId');
+        if (action !== 'cancel' || !mongoose.Types.ObjectId.isValid(bookingId)) {
+            console.error('Invalid action or bookingId');
             res.status(400).send('Invalid request');
             return;
         }
 
         try {
             console.log('Canceling booking with ID:', bookingId);
-            await cancelBookingById(bookingId); // Функция отмены бронирования
+            await cancelBookingById(bookingId);
 
             await fetch(`${telegramUrl}/answerCallbackQuery`, {
                 method: 'POST',
@@ -276,6 +277,8 @@ app.get('/api/time-slots/master/:masterId', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+
+app.post('/bookings', createBooking);
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 
