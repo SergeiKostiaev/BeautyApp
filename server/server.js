@@ -18,7 +18,7 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
-const { cancelBooking, createBooking } = require('../client/src/components/bookingService'); // Правильный путь
+const { cancelBooking, createBooking } = require('./routes/bookingService'); // Правильный путь
 // const createBooking = require('./routes/bookingController');
 
 const app = express();
@@ -49,7 +49,7 @@ app.use('/api/services', servicesRouter);
 app.use('/api/schedules', schedulesRouter);
 app.use(bodyParser.json());
 
-const telegramToken = process.env.TELEGRAM_TOKEN || '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+const telegramToken = process.env.TELEGRAM_TOKEN || 'your-telegram-token';
 const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
 
 const storage = multer.diskStorage({
@@ -161,7 +161,6 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
-
 app.post('/webhook', async (req, res) => {
     const { callback_query } = req.body;
 
@@ -189,7 +188,6 @@ app.post('/webhook', async (req, res) => {
     }
 });
 
-
 app.delete('/api/masters/:id', async (req, res) => {
     try {
         const masterId = req.params.id;
@@ -200,7 +198,7 @@ app.delete('/api/masters/:id', async (req, res) => {
 
         const result = await Master.findByIdAndDelete(masterId);
 
-        if (!result) {
+        if (!result){
             return res.status(404).json({ message: 'Master not found' });
         }
 
@@ -284,5 +282,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Сервер запущен на порту ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
