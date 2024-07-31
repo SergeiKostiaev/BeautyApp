@@ -172,7 +172,7 @@ app.post('/webhook', async (req, res) => {
 
         try {
             console.log('Canceling booking with ID:', bookingId);
-            const result = await cancelBookingById(bookingId);
+            await cancelBookingById(bookingId);
 
             // Отправка ответа в Telegram
             await fetch(`${telegramUrl}/answerCallbackQuery`, {
