@@ -19,7 +19,6 @@ const TimeSlot = require('./models/timeSlot'); // Подключение мод�
 const sendToTelegram = require('./Telegram');
 const cancelBookingById = require('./cancelBookingById'); // Подключение функции отмены бронирования
 const bodyParser = require('body-parser');
-const sendToTelegram = require('./Telegram');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
