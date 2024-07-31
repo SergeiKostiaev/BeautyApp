@@ -1,19 +1,23 @@
-const Booking = require('./models/Booking');
+const mongoose = require('mongoose');
+const Booking = require('./models/Booking'); // Убедитесь, что путь к модели правильный
 
 const cancelBookingById = async (bookingId) => {
+    if (!bookingId || bookingId.length !== 24) { // Проверка длины для MongoDB ObjectId
+        throw new Error('Invalid bookingId');
+    }
+
     try {
-        const booking = await Booking.findById(bookingId);
-        if (!booking) {
+        const result = await Booking.findByIdAndUpdate(bookingId, { booked: false }, { new: true });
+
+        if (!result) {
             throw new Error('Booking not found');
         }
 
-        booking.booked = false;
-        await booking.save();
-        console.log('Booking cancelled successfully');
+        return result;
     } catch (error) {
-        console.error('Error cancelling booking:', error);
         throw error;
     }
 };
+
 
 module.exports = cancelBookingById;

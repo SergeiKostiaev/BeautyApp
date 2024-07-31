@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 export const createBooking = async (bookingData) => {
     try {
         const response = await axios.post('https://devprimeclients.ru/api/bookings', bookingData, {
@@ -31,5 +30,3 @@ export const cancelBooking = async (bookingId) => {
         throw error;
     }
 };
-
-
