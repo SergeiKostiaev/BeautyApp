@@ -18,7 +18,7 @@ const sendToTelegram = async (message, bookingId) => {
         const response = await fetch(`${telegramUrl}/sendMessage`, {
             method: 'POST',
             body: JSON.stringify({
-                chat_id: '414951154',
+                chat_id: '414951154', // Убедитесь, что это правильный chat_id
                 text: `${message}\n\nBooking ID: ${bookingId}`,
                 parse_mode: 'HTML',
                 reply_markup: {
