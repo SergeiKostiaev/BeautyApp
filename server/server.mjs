@@ -1,29 +1,23 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const path = require('path');
-const multer = require('multer');
-const dotenv = require('dotenv');
-const fetch = require('node-fetch');
-const bodyParser = require('body-parser');
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import path from 'path';
+import multer from 'multer';
+import fetch from 'node-fetch';
+import bodyParser from 'body-parser';
+import bookingsRouter from './routes/bookings';
+import timeSlotsRouter from './routes/timeSlots';
+import mastersRouter from './routes/masters';
+import servicesRouter from './routes/services';
+import schedulesRouter from './routes/schedules';
+import { cancelBooking, createBooking } from '../client/src/components/bookingService';
+import Service from './models/Service';
+import Master from './models/Master';
+import Booking from './models/Booking';
+import TimeSlot from './models/timeSlot';
+import sendToTelegram from './Telegram';
+
 dotenv.config();
-
-const bookingsRouter = require('./routes/bookings');
-const timeSlotsRouter = require('./routes/timeSlots');
-const mastersRouter = require('./routes/masters');
-const servicesRouter = require('./routes/services');
-const schedulesRouter = require('./routes/schedules');
-const Service = require('./models/Service');
-const Master = require('./models/Master');
-const Booking = require('./models/Booking');
-const TimeSlot = require('./models/timeSlot');
-const sendToTelegram = require('./Telegram');
-const bookingService = await import('../client/src/components/bookingService');
-
-// Используйте экспортированные функции из bookingService
-const createBooking = bookingService.createBooking;
-const cancelBooking = bookingService.cancelBooking;
-// const createBooking = require('./routes/bookingController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -277,26 +271,7 @@ app.get('/api/time-slots/master/:masterId', async (req, res) => {
     }
 });
 
-app.post('/create-booking', async (req, res) => {
-    try {
-        const bookingData = req.body;
-        const result = await createBooking(bookingData);
-        res.status(200).json(result);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to create booking' });
-    }
-});
-
-app.post('/cancel-booking', async (req, res) => {
-    try {
-        const { bookingId } = req.body;
-        const result = await cancelBooking(bookingId);
-        res.status(200).json(result);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to cancel booking' });
-    }
-});
-
+app.post('/bookings', createBooking);
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 
