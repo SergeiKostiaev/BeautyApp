@@ -1,40 +1,51 @@
+// server/server.js
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
 const dotenv = require('dotenv');
-const fetch = require('node-fetch');
-const bodyParser = require('body-parser');
-
 dotenv.config();
 
 const bookingsRouter = require('./routes/bookings');
 const timeSlotsRouter = require('./routes/timeSlots');
-const mastersRouter = require('./routes/masters');
-const servicesRouter = require('./routes/services');
+const mastersRouter = require('./routes/masters'); // Подключение роутера для мастеров
+const servicesRouter = require('./routes/services'); // Подключение роутера для услуг
 const schedulesRouter = require('./routes/schedules');
 const Service = require('./models/Service');
 const Master = require('./models/Master');
 const Booking = require('./models/Booking');
-const TimeSlot = require('./models/timeSlot');
+const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
 const sendToTelegram = require('./Telegram');
-
-dotenv.config();
+const cancelBookingById = require('./cancelBookingById'); // Подключение функции отмены бронирования
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://31.172.75.47:3000',
+    origin: 'http://31.172.75.47:3000', // ваш фронтенд URL из переменной окружения
     optionsSuccessStatus: 200,
 };
+// CORS настройки
+// const corsOptions = {
+//     origin: (origin, callback) => {
+//         const allowedOrigins = ['http://localhost:3000', 'https://devprimeclients.ru/'];
+//         if (!origin || allowedOrigins.includes(origin)) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+//     optionsSuccessStatus: 200,
+// };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/beauty-booking')
+// Подключение к MongoDB
+mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('MongoDB connected');
     })
@@ -42,17 +53,18 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/beauty-book
         console.error('MongoDB connection error:', err);
     });
 
+// Middleware для обработки статических файлов
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Маршруты
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/time-slots', timeSlotsRouter);
-app.use('/api/masters', mastersRouter);
-app.use('/api/services', servicesRouter);
+app.use('/api/masters', mastersRouter); // Использование роутера для мастеров
+app.use('/api/services', servicesRouter); // Использование роутера для услуг
 app.use('/api/schedules', schedulesRouter);
 app.use(bodyParser.json());
 
-const telegramToken = process.env.TELEGRAM_TOKEN || 'your-telegram-token';
-const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
-
+// Настройка multer для хранения файлов
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/');
@@ -63,10 +75,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Пример обработки /api/schedules/:masterId
 app.get('/api/schedules/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const schedule = await Schedule.find({ masterId });
+        const schedule = await Schedule.find({ masterId }); // Пример использования Mongoose
         res.json(schedule);
     } catch (error) {
         console.error('Error fetching schedule:', error);
@@ -74,10 +87,12 @@ app.get('/api/schedules/:masterId', async (req, res) => {
     }
 });
 
+// Пример обработки /api/timeslots/:masterId
 app.get('/api/time-slots/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const date = req.query.date;
+        const date = req.query.date; // Получаем дату из query параметра
+        // Ваш код для получения временных слотов по masterId и date
         const timeslots = await TimeSlot.find({ masterId, date });
         res.json(timeslots);
     } catch (error) {
@@ -86,11 +101,15 @@ app.get('/api/time-slots/:masterId', async (req, res) => {
     }
 });
 
+// Маршрут для добавления новой услуги с загрузкой изображения
 app.post('/api/services/new', upload.single('image'), async (req, res) => {
     try {
         const { name } = req.body;
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : '';
-        const newService = new Service({ name, imageUrl });
+        const newService = new Service({
+            name,
+            imageUrl
+        });
         const savedService = await newService.save();
         res.status(201).json(savedService);
     } catch (error) {
@@ -99,6 +118,7 @@ app.post('/api/services/new', upload.single('image'), async (req, res) => {
     }
 });
 
+// Маршрут для получения всех услуг
 app.get('/api/services', async (req, res) => {
     try {
         const services = await Service.find();
@@ -108,6 +128,7 @@ app.get('/api/services', async (req, res) => {
     }
 });
 
+// Маршрут для получения услуги по ID
 app.get('/api/services/:id', async (req, res) => {
     try {
         const service = await Service.findById(req.params.id);
@@ -117,16 +138,16 @@ app.get('/api/services/:id', async (req, res) => {
     }
 });
 
+// Маршрут для создания бронирования
 app.post('/api/bookings', async (req, res) => {
     const { masterId, customerName, customerPhone, date, time } = req.body;
+
     try {
         const newBooking = new Booking({ masterId, customerName, customerPhone, date, time });
         await newBooking.save();
 
-        console.log('Booking created with ID:', newBooking._id);
-
-        // Передача ID в функцию отправки сообщения
-        await sendToTelegram(`New booking:\nName: ${customerName}\nPhone: ${customerPhone}\nDate: ${date}\nTime: ${time}`, newBooking._id.toString());
+        // Отправка уведомления в Telegram с кнопкой отмены
+        await sendToTelegram(`New booking:\nName: ${customerName}\nPhone: ${customerPhone}\nDate: ${date}\nTime: ${time}`, newBooking._id);
 
         res.status(201).json(newBooking);
     } catch (error) {
@@ -135,10 +156,20 @@ app.post('/api/bookings', async (req, res) => {
     }
 });
 
+// Обработка POST запроса для создания временного слота
 app.post('/api/time-slots', async (req, res) => {
     try {
         const { startTime, endTime, masterId, date } = req.body;
-        const newTimeSlot = new TimeSlot({ startTime, endTime, masterId, date, available: true });
+
+        // Создайте новый временной интервал
+        const newTimeSlot = new TimeSlot({
+            startTime,
+            endTime,
+            masterId,
+            date,
+            available: true, // По умолчанию интервал доступен
+        });
+
         await newTimeSlot.save();
         res.status(201).json(newTimeSlot);
     } catch (error) {
@@ -147,14 +178,11 @@ app.post('/api/time-slots', async (req, res) => {
     }
 });
 
+// Маршрут для отправки сообщений в Telegram
 app.post('/api/send-telegram', async (req, res) => {
     try {
         const { message } = req.body;
-        if (!message) {
-            return res.status(400).send('Message is required');
-        }
-
-        await sendToTelegram(message);
+        await sendToTelegram(message); // Убедитесь, что `sendToTelegram` правильно импортирована
         res.status(200).send('Message sent to Telegram');
     } catch (error) {
         console.error('Error sending message to Telegram:', error);
@@ -162,69 +190,8 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
-app.post('/webhook', async (req, res) => {
-    const { callback_query } = req.body;
-
-    if (callback_query) {
-        const { id, data } = callback_query;
-
-        if (data.startsWith('cancel_')) {
-            const bookingId = data.split('_')[1];
-
-            try {
-                // Обработка отмены бронирования
-                await cancelBooking(bookingId);
-                // Отправка подтверждения в Telegram
-                await sendToTelegram(`Booking with ID ${bookingId} has been cancelled.`);
-                res.status(200).send('OK');
-            } catch (error) {
-                console.error('Error handling callback query:', error);
-                res.status(500).send('Error');
-            }
-        } else {
-            res.status(400).send('Invalid callback data');
-        }
-    } else {
-        res.status(400).send('No callback query');
-    }
-});
-
-app.delete('/api/masters/:id', async (req, res) => {
-    try {
-        const masterId = req.params.id;
-
-        if (!masterId) {
-            return res.status(400).json({ message: 'Invalid master ID' });
-        }
-
-        const result = await Master.findByIdAndDelete(masterId);
-
-        if (!result){
-            return res.status(404).json({ message: 'Master not found' });
-        }
-
-        res.status(200).json({ message: 'Master deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting master:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
-app.delete('/api/services/:id', async (req, res) => {
-    const serviceId = req.params.id;
-    try {
-        const result = await Service.findByIdAndDelete(serviceId);
-        if (!result) {
-            return res.status(404).json({ message: 'Service not found' });
-        }
-        res.status(200).json({ message: 'Service deleted successfully' });
-    } catch (error) {
-        console.error('Error deleting service:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
-app.post(`/api/telegram/${process.env.TELEGRAM_TOKEN}`, async (req, res) => {
+// Обработка запросов для отмены бронирования через Telegram
+app.post(`/api/telegram/webhook`, async (req, res) => {
     const { callback_query } = req.body;
 
     if (callback_query && callback_query.data) {
@@ -232,7 +199,9 @@ app.post(`/api/telegram/${process.env.TELEGRAM_TOKEN}`, async (req, res) => {
 
         try {
             await cancelBookingById(bookingId);
-            await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
+            const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+            const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+            await fetch(telegramUrl, {
                 method: 'POST',
                 body: JSON.stringify({
                     chat_id: callback_query.message.chat.id,
@@ -251,6 +220,76 @@ app.post(`/api/telegram/${process.env.TELEGRAM_TOKEN}`, async (req, res) => {
     }
 });
 
+// Маршрут для удаления мастера
+app.delete('/api/masters/:id', async (req, res) => {
+    try {
+        const masterId = req.params.id;
+
+        // Убедитесь, что идентификатор корректен
+        if (!masterId) {
+            return res.status(400).json({ message: 'Invalid master ID' });
+        }
+
+        // Удалите мастера из базы данных
+        const result = await Master.findByIdAndDelete(masterId);
+
+        if (!result) {
+            return res.status(404).json({ message: 'Master not found' });
+        }
+
+        res.status(200).json({ message: 'Master deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting master:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Маршрут для удаления сервиса
+app.delete('/api/services/:id', async (req, res) => {
+    const serviceId = req.params.id;
+
+    try {
+        const result = await Service.findByIdAndDelete(serviceId);
+        if (!result) {
+            return res.status(404).json({ message: 'Service not found' });
+        }
+        res.status(200).json({ message: 'Service deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting service:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Обработка запросов для отмены бронирования через Telegram
+app.post(`/api/telegram/${process.env.TELEGRAM_TOKEN}`, async (req, res) => {
+    const { callback_query } = req.body;
+
+    if (callback_query && callback_query.data) {
+        const bookingId = callback_query.data.split('_')[1];
+
+        try {
+            await cancelBookingById(bookingId);
+            const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
+            await fetch(telegramUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    chat_id: callback_query.message.chat.id,
+                    text: `Booking ${bookingId} has been successfully canceled.`,
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            res.status(200).send('Booking canceled');
+        } catch (error) {
+            console.error('Error processing callback query:', error);
+            res.status(500).send('Internal server error');
+        }
+    } else {
+        res.status(400).send('Bad request');
+    }
+});
+
+// Определение маршрута для получения временных слотов мастера
 app.get('/api/time-slots/master/:masterId', async (req, res) => {
     const { masterId } = req.params;
     const { date } = req.query;
@@ -274,14 +313,14 @@ app.get('/api/time-slots/master/:masterId', async (req, res) => {
     }
 });
 
-app.post('/bookings', createBooking);
-
+// Сервирование статических файлов из папки build
 app.use(express.static(path.join(__dirname, '../client/build')));
 
+// Обработка всех остальных запросов
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Сервер запущен на порту ${PORT}`);
 });
