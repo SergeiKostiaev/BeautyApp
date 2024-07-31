@@ -123,7 +123,6 @@ router.post('/cancel', async (req, res) => {
     const { bookingId } = req.body;
 
     try {
-        // Найти и обновить запись о бронировании
         const booking = await Booking.findById(bookingId);
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -132,18 +131,26 @@ router.post('/cancel', async (req, res) => {
         booking.isCancelled = true;
         await booking.save();
 
-        // Освободить временной слот, если необходимо
-        // Например, обновить соответствующую запись временного слота в базе данных
+        const timeSlot = await TimeSlot.findOne({
+            masterId: booking.masterId,
+            date: booking.date,
+            startTime: booking.time
+        });
+
+        if (timeSlot) {
+            timeSlot.booked = false;
+            timeSlot.available = true;
+            await timeSlot.save();
+        }
 
         res.status(200).json({ message: 'Booking cancelled successfully' });
 
-        // Отправить уведомление в Telegram
+        // Отправка уведомления в Telegram
         sendToTelegram(`Booking cancelled:\nName: ${booking.customerName}\nPhone: ${booking.customerPhone}\nDate: ${booking.date}\nTime: ${booking.time}`);
     } catch (error) {
         console.error('Error cancelling booking:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 module.exports = router;

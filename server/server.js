@@ -163,40 +163,29 @@ app.post('/api/send-telegram', async (req, res) => {
 
 
 app.post('/webhook', async (req, res) => {
-    const update = req.body;
+    const { callback_query } = req.body;
 
-    if (update.callback_query && update.callback_query.data) {
-        const callbackData = update.callback_query.data;
-        const [action, bookingId] = callbackData.split('_'); // Извлечение action и bookingId
+    if (callback_query) {
+        const { id, data } = callback_query;
 
-        if (action !== 'cancel' || !mongoose.Types.ObjectId.isValid(bookingId)) {
-            console.error('Invalid action or bookingId:', { action, bookingId });
-            res.status(400).send('Invalid request');
-            return;
-        }
+        if (data.startsWith('cancel_')) {
+            const bookingId = data.split('_')[1];
 
-        try {
-            console.log('Canceling booking with ID:', bookingId);
-            const booking = await cancelBookingById(bookingId);
-
-            // Отправка ответа в Telegram
-            await fetch(`${telegramUrl}/answerCallbackQuery`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    callback_query_id: update.callback_query.id,
-                    text: 'Booking canceled successfully',
-                    show_alert: false
-                }),
-                headers: { 'Content-Type': 'application/json' },
-            });
-
-            res.status(200).send('Booking canceled and response sent to Telegram');
-        } catch (error) {
-            console.error('Error processing callback query:', error);
-            res.status(500).send('Error processing request');
+            try {
+                // Обработка отмены бронирования
+                await cancelBooking(bookingId);
+                // Отправка подтверждения в Telegram
+                await sendToTelegram(`Booking with ID ${bookingId} has been cancelled.`);
+                res.status(200).send('OK');
+            } catch (error) {
+                console.error('Error handling callback query:', error);
+                res.status(500).send('Error');
+            }
+        } else {
+            res.status(400).send('Invalid callback data');
         }
     } else {
-        res.status(400).send('Not a callback query');
+        res.status(400).send('No callback query');
     }
 });
 
