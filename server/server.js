@@ -48,7 +48,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Подключение к MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
     .then(() => {
         console.log('MongoDB connected');
     })
@@ -194,13 +194,13 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 // Обработка запросов для отмены бронирования через Telegram
-// Обработка запросов для отмены бронирования через Telegram
 app.post('/webhook', async (req, res) => {
     const update = req.body;
 
     if (update.callback_query) {
         const callbackData = update.callback_query.data;
         const bookingId = callbackData.split('_')[1]; // Извлекаем Booking ID
+        console.log('Received callback query with bookingId:', bookingId); // Логируем ID бронирования
 
         try {
             // Отмена бронирования и обновление статуса в базе данных

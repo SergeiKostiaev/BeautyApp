@@ -3,6 +3,7 @@ const Booking = require('./models/Booking'); // Убедитесь, что пу�
 
 const cancelBookingById = async (bookingId) => {
     try {
+        console.log('Canceling booking with ID:', bookingId); // Логируем ID бронирования
         // Найти бронирование по ID и обновить поле booked
         const result = await Booking.findByIdAndUpdate(
             bookingId,
