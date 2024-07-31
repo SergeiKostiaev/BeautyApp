@@ -109,7 +109,7 @@ const ServicesPage = () => {
                         selected={selectedService === service._id}
                     >
                         <StyledAvatarBox>
-                            <StyledAvatar src={`https://devprimeclients.ru/${service.imageUrl}`} />
+                            <StyledAvatar src={`https://devprimeclients.ru${service.imageUrl}`} />
                         </StyledAvatarBox>
                         <StyledListItemText primary={t(`services.${service.name}`)} />
                     </StyledListItem>

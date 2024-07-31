@@ -133,7 +133,7 @@ const MastersPage = () => {
                         selected={selectedMaster === master._id}
                     >
                         <StyledAvatarBox>
-                            <StyledAvatar src={`https://devprimeclients.ru/${master.imageUrl}`} />
+                            <StyledAvatar src={`https://devprimeclients.ru${master.imageUrl}`} />
                         </StyledAvatarBox>
                         <Typography sx={{ flex: 1, ml: 2 }}>
                             {master.name}
