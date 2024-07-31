@@ -90,8 +90,15 @@ const BookingPage = () => {
             setLoading(true);
             const response = await createBooking(bookingData);
             console.log('Booking created:', response);
-            await fetchAvailableTimeSlots();
-            setBookingSuccess(true);
+
+            // Убедитесь, что response содержит нужные данные
+            if (response._id) {
+                // Успешное создание бронирования
+                await fetchAvailableTimeSlots();
+                setBookingSuccess(true);
+            } else {
+                throw new Error('Booking ID not returned');
+            }
         } catch (error) {
             console.error('Error creating booking:', error);
             setError(t('booking_page.booking_error'));
