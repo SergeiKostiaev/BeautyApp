@@ -1,7 +1,6 @@
-import axios from 'axios';
+const axios = require('axios');
 
-
-export const createBooking = async (bookingData) => {
+const createBooking = async (bookingData) => {
     try {
         const response = await axios.post('https://devprimeclients.ru/api/bookings', bookingData, {
             headers: { 'Content-Type': 'application/json' },
@@ -20,7 +19,7 @@ export const createBooking = async (bookingData) => {
     }
 };
 
-export const cancelBooking = async (bookingId) => {
+const cancelBooking = async (bookingId) => {
     try {
         const response = await axios.post('https://devprimeclients.ru/api/bookings/cancel', { bookingId }, {
             headers: { 'Content-Type': 'application/json' },
@@ -32,4 +31,8 @@ export const cancelBooking = async (bookingId) => {
     }
 };
 
+module.exports = {
+    createBooking,
+    cancelBooking,
+};
 
