@@ -149,6 +149,10 @@ app.post('/api/time-slots', async (req, res) => {
 app.post('/api/send-telegram', async (req, res) => {
     try {
         const { message } = req.body;
+        if (!message) {
+            return res.status(400).send('Message is required');
+        }
+
         await sendToTelegram(message);
         res.status(200).send('Message sent to Telegram');
     } catch (error) {
