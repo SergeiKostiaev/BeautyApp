@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Booking = require('./models/Booking'); // Убедитесь, что путь к модели правильный
 
 const cancelBookingById = async (bookingId) => {
