@@ -18,6 +18,7 @@
 const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
+    masterId: mongoose.Schema.Types.ObjectId,
     date: String,
     time: String,
     customerName: String,
