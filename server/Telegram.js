@@ -5,6 +5,10 @@ const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
 // Функция отправки сообщения в Telegram
 const sendToTelegram = async (message, bookingId) => {
     try {
+        if (!bookingId || typeof bookingId !== 'string') {
+            throw new Error('Invalid bookingId');
+        }
+
         console.log('Sending message to Telegram with bookingId:', bookingId); // Логируем ID бронирования
 
         const response = await fetch(`${telegramUrl}/sendMessage`, {

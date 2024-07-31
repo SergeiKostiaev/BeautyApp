@@ -206,6 +206,11 @@ app.post('/webhook', async (req, res) => {
         const bookingId = callbackData.split('_')[1]; // Извлекаем Booking ID
         console.log('Received callback query with bookingId:', bookingId); // Логируем ID бронирования
 
+        if (!bookingId) {
+            console.error('Invalid bookingId extracted from callback data');
+            return res.status(400).send('Invalid bookingId');
+        }
+
         try {
             // Отмена бронирования и обновление статуса в базе данных
             await cancelBookingById(bookingId);
