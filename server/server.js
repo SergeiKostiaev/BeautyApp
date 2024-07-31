@@ -18,6 +18,8 @@ const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
 const sendToTelegram = require('./Telegram');
 const cancelBookingById = require('./cancelBookingById'); // Подключение функции отмены бронирования
+const bodyParser = require('body-parser');
+const sendToTelegram = require('./Telegram');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,6 +63,7 @@ app.use('/api/time-slots', timeSlotsRouter);
 app.use('/api/masters', mastersRouter); // Использование роутера для мастеров
 app.use('/api/services', servicesRouter); // Использование роутера для услуг
 app.use('/api/schedules', schedulesRouter);
+app.use(bodyParser.json());
 
 // Настройка multer для хранения файлов
 const storage = multer.diskStorage({
@@ -188,27 +191,33 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
-app.post('/api/telegram/webhook', (req, res) => {
-    console.log('Received webhook:', req.body);
+// Обработка запросов для отмены бронирования через Telegram
+app.post(`/api/telegram/webhook`, async (req, res) => {
+    const { callback_query } = req.body;
 
-    const { message } = req.body;
+    if (callback_query && callback_query.data) {
+        const bookingId = callback_query.data.split('_')[1];
 
-    if (message) {
-        const bookingId = message.text.match(/cancel_(\d+)/);
-        if (bookingId) {
-            // Отмените запись в вашей системе
-            cancelBookingById(bookingId[1]).then(() => {
-                sendToTelegram('Запись отменена', bookingId[1]);
-                res.send('OK');
-            }).catch(error => {
-                console.error('Error canceling booking:', error);
-                res.status(500).send('Internal Server Error');
+        try {
+            await cancelBookingById(bookingId);
+            const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+            const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+            await fetch(telegramUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    chat_id: callback_query.message.chat.id,
+                    text: `Booking ${bookingId} has been successfully canceled.`,
+                }),
+                headers: { 'Content-Type': 'application/json' },
             });
-        } else {
-            res.send('Invalid request');
+
+            res.status(200).send('Booking canceled');
+        } catch (error) {
+            console.error('Error processing callback query:', error);
+            res.status(500).send('Internal server error');
         }
     } else {
-        res.send('No message');
+        res.status(400).send('Bad request');
     }
 });
 
