@@ -192,15 +192,16 @@ app.post('/api/send-telegram', async (req, res) => {
 
 // Обработка запросов для отмены бронирования через Telegram
 app.post(`/api/telegram/webhook`, async (req, res) => {
+    console.log('Received webhook:', req.body);
+
     const { callback_query } = req.body;
 
     if (callback_query && callback_query.data) {
         const bookingId = callback_query.data.split('_')[1];
 
         try {
-            await cancelBookingById(bookingId);
-            const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-            const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+            await cancelBookingById(bookingId); // Убедитесь, что функция правильно импортирована
+            const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
             await fetch(telegramUrl, {
                 method: 'POST',
                 body: JSON.stringify({
