@@ -1,27 +1,27 @@
-import express from 'express';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import path from 'path';
-import multer from 'multer';
-import dotenv from 'dotenv';
-import fetch from 'node-fetch';
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const path = require('path');
+const multer = require('multer');
+const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
+const fetch = require('node-fetch');
+
+dotenv.config();
 
 // Импорт роутеров и функций
-import bookingsRouter from './routes/bookings.js';
-import timeSlotsRouter from './routes/timeSlots.js';
-import mastersRouter from './routes/masters.js';
-import servicesRouter from './routes/services.js';
-import schedulesRouter from './routes/schedules.js';  // Убедитесь, что этот роутер используется
-import Service from './models/Service.js';
-import Master from './models/Master.js';
-import Booking from './models/Booking.js';
-import TimeSlot from './models/timeSlot.js';
-import Schedule from './models/Schedule.js';  // Импорт модели Schedule
-import sendToTelegram from './Telegram.js';
-import cancelBookingById from './cancelBookingById.js';
+const bookingsRouter = require('./routes/bookings');
+const timeSlotsRouter = require('./routes/timeSlots');
+const mastersRouter = require('./routes/masters');
+const servicesRouter = require('./routes/services');
+const schedulesRouter = require('./routes/schedules');
+const Service = require('./models/Service');
+const Master = require('./models/Master');
+const Booking = require('./models/Booking');
+const TimeSlot = require('./models/timeSlot');
+const sendToTelegram = require('./Telegram');
+const cancelBookingById = require('./cancelBookingById');
 
-// Настройки
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -36,15 +36,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Подключение к MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking')
     .then(() => console.log('MongoDB connected'))
     .catch((err) => console.error('MongoDB connection error:', err));
 
 // Middleware для обработки статических файлов
-app.use('/uploads', express.static(path.join(path.resolve(), 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Подключение роутеров
 app.use('/api/bookings', bookingsRouter);
@@ -52,6 +49,7 @@ app.use('/api/time-slots', timeSlotsRouter);
 app.use('/api/masters', mastersRouter);
 app.use('/api/services', servicesRouter);
 app.use('/api/schedules', schedulesRouter);
+app.use(bodyParser.json());
 
 // Настройка multer для хранения файлов
 const storage = multer.diskStorage({
@@ -68,7 +66,7 @@ const upload = multer({ storage: storage });
 app.get('/api/schedules/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const schedule = await Schedule.find({ masterId });
+        const schedule = await Schedule.find({ masterId }); // Убедитесь, что Schedule импортирован или используется правильно
         res.json(schedule);
     } catch (error) {
         console.error('Error fetching schedule:', error);
@@ -266,11 +264,11 @@ app.get('/api/time-slots/master/:masterId', async (req, res) => {
 });
 
 // Сервирование статических файлов из папки build
-app.use(express.static(path.join(path.resolve(), '../client/build')));
+app.use(express.static(path.join(__dirname, '../client/build')));
 
 // Обработка всех остальных запросов
 app.get('*', (req, res) => {
-    res.sendFile(path.join(path.resolve(), '../client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(PORT, () => {
