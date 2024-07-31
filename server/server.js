@@ -1,3 +1,5 @@
+import {cancelBooking, createBooking} from "../client/src/components/bookingService"; // Правильный путь
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -18,9 +20,7 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
-// const cancelBookingById = require('./cancelBookingById');
-const { cancelBooking } = require('../client/src/components/bookingService');
-const createBooking = require('./routes/bookingController');
+// const createBooking = require('./routes/bookingController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
