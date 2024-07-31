@@ -2,6 +2,9 @@ const Booking = require('./models/Booking'); // Убедитесь, что пу�
 
 const cancelBookingById = async (bookingId) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+            throw new Error('Invalid Booking ID');
+        }
         const result = await Booking.findByIdAndDelete(bookingId); // Или метод для отмены бронирования
         if (!result) {
             throw new Error('Booking not found');

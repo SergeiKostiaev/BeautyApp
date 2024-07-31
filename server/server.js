@@ -191,30 +191,40 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 // Обработка запросов для отмены бронирования через Telegram
-app.post(`/api/telegram/webhook`, async (req, res) => {
+app.post('/api/telegram/webhook', async (req, res) => {
     console.log('Received webhook:', req.body);
 
     const { callback_query } = req.body;
 
     if (callback_query && callback_query.data) {
-        const bookingId = callback_query.data.split('_')[1];
+        const parts = callback_query.data.split('_');
+        if (parts.length === 2) {
+            const action = parts[0]; // 'cancel'
+            const bookingId = parts[1]; // Должен быть bookingId
 
-        try {
-            await cancelBookingById(bookingId); // Убедитесь, что функция правильно импортирована
-            const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
-            await fetch(telegramUrl, {
-                method: 'POST',
-                body: JSON.stringify({
-                    chat_id: callback_query.message.chat.id,
-                    text: `Booking ${bookingId} has been successfully canceled.`,
-                }),
-                headers: { 'Content-Type': 'application/json' },
-            });
+            try {
+                if (action === 'cancel') {
+                    await cancelBookingById(bookingId); // Убедитесь, что функция правильно импортирована
+                    const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
+                    await fetch(telegramUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            chat_id: callback_query.message.chat.id,
+                            text: `Booking ${bookingId} has been successfully canceled.`,
+                        }),
+                        headers: { 'Content-Type': 'application/json' },
+                    });
 
-            res.status(200).send('Booking canceled');
-        } catch (error) {
-            console.error('Error processing callback query:', error);
-            res.status(500).send('Internal server error');
+                    res.status(200).send('Booking canceled');
+                } else {
+                    res.status(400).send('Invalid action');
+                }
+            } catch (error) {
+                console.error('Error processing callback query:', error);
+                res.status(500).send('Internal server error');
+            }
+        } else {
+            res.status(400).send('Invalid callback data format');
         }
     } else {
         res.status(400).send('Bad request');

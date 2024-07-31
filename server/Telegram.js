@@ -5,6 +5,11 @@ const sendToTelegram = async (message, bookingId) => {
     const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
 
     try {
+        // Проверяем, что bookingId не undefined и имеет корректный формат
+        if (!bookingId || typeof bookingId !== 'string') {
+            throw new Error('Invalid bookingId');
+        }
+
         const response = await fetch(telegramUrl, {
             method: 'POST',
             body: JSON.stringify({
@@ -16,7 +21,7 @@ const sendToTelegram = async (message, bookingId) => {
                         [
                             {
                                 text: 'Отменить запись',
-                                callback_data: `cancel_${bookingId}` // Убедитесь, что bookingId не undefined
+                                callback_data: `cancel_${bookingId}`
                             }
                         ]
                     ]
@@ -38,4 +43,4 @@ const sendToTelegram = async (message, bookingId) => {
     }
 };
 
-export default sendToTelegram();
+export default sendToTelegram;
