@@ -76,7 +76,7 @@ const ServicesPage = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get(`http://31.172.75.47:5000/api/services/`);
+                const response = await axios.get(`https://devprimeclients.ru/api/services/`);
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
@@ -109,7 +109,7 @@ const ServicesPage = () => {
                         selected={selectedService === service._id}
                     >
                         <StyledAvatarBox>
-                            <StyledAvatar src={`http://31.172.75.47:5000${service.imageUrl}`} />
+                            <StyledAvatar src={`https://devprimeclients.ru/${service.imageUrl}`} />
                         </StyledAvatarBox>
                         <StyledListItemText primary={t(`services.${service.name}`)} />
                     </StyledListItem>

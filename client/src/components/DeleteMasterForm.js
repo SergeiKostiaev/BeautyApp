@@ -19,7 +19,7 @@ const DeleteMasterForm = () => {
     const [success, setSuccess] = useState(null); // Состояние для успешного удаления
 
     useEffect(() => {
-        axios.get('http://31.172.75.47:5000/api/masters')
+        axios.get('https://devprimeclients.ru/api/masters')
             .then(response => setMasters(response.data))
             .catch(error => console.error('Error fetching masters:', error));
     }, []);
@@ -30,7 +30,7 @@ const DeleteMasterForm = () => {
             return;
         }
 
-        axios.delete(`http://31.172.75.47:5000/api/masters/${selectedMasterId}`)
+        axios.delete(`https://devprimeclients.ru/api/masters/${selectedMasterId}`)
             .then(() => {
                 setMasters(masters.filter(master => master._id !== selectedMasterId));
                 setSelectedMasterId('');

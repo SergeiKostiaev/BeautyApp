@@ -21,7 +21,7 @@ const TimeSettingsForm = () => {
 
     const fetchMasters = async () => {
         try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/masters`);
+            const response = await axios.get(`https://devprimeclients.ru/api/masters`);
             setMasters(response.data);
         } catch (error) {
             console.error('Ошибка загрузки мастеров:', error);
@@ -31,7 +31,7 @@ const TimeSettingsForm = () => {
 
     const fetchTimeSlots = async (masterId, date) => {
         try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}?date=${date}`);
+            const response = await axios.get(`https://devprimeclients.ru/api/time-slots/master/${masterId}?date=${date}`);
             setTimeSlots(response.data);
         } catch (error) {
             console.error('Ошибка при получении слотов времени:', error);
@@ -58,7 +58,7 @@ const TimeSettingsForm = () => {
         console.log('Данные, отправляемые на сервер:', requestData);
 
         try {
-            const response = await axios.post(`http://31.172.75.47:5000/api/time-slots`, requestData);
+            const response = await axios.post(`https://devprimeclients.ru/api/time-slots`, requestData);
             const newTimeSlot = response.data;
             setTimeSlots(prevTimeSlots => [...prevTimeSlots, newTimeSlot]);
             setStartTime('');

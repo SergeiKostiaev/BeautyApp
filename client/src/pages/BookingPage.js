@@ -40,7 +40,7 @@ const BookingPage = () => {
     const fetchAvailableTimeSlots = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}`, {
+            const response = await axios.get(`https://devprimeclients.ru/api/time-slots/master/${masterId}`, {
                 params: { date },
                 headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
             });

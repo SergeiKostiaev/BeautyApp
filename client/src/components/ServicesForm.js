@@ -29,7 +29,7 @@ const ServicesForm = () => {
         formData.append('image', serviceImage);
 
         try {
-            const response = await axios.post(`http://31.172.75.47:5000/api/services/new`, formData, {
+            const response = await axios.post(`https://devprimeclients.ru/api/services/new`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

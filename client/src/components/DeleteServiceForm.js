@@ -23,7 +23,7 @@ const DeleteServiceForm = () => {
     const [services, setServices] = useState([]);
 
     useEffect(() => {
-        axios.get('http://31.172.75.47:5000/api/services')
+        axios.get('https://devprimeclients.ru/api/services')
             .then(response => setServices(response.data))
             .catch(error => console.error(error));
     }, []);
@@ -31,7 +31,7 @@ const DeleteServiceForm = () => {
     const handleDelete = (serviceId) => {
         console.log(`Attempting to delete service with ID: ${serviceId}`);
 
-        axios.delete(`http://31.172.75.47:5000/api/services/${serviceId}`)
+        axios.delete(`https://devprimeclients.ru/api/services/${serviceId}`)
             .then(() => {
                 console.log('Service deleted successfully');
                 setServices(services.filter(service => service._id !== serviceId));
