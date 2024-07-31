@@ -19,7 +19,7 @@ const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
 // const cancelBookingById = require('./cancelBookingById');
-const { cancelBooking } = require('./cancelBookingById');
+const { cancelBooking } = require('../client/src/components/bookingService');
 const createBooking = require('./routes/bookingController');
 
 const app = express();
