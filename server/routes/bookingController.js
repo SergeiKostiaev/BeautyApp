@@ -1,5 +1,5 @@
-const sendToTelegram = require('../sendToTelegram'); // Обратите внимание на корректный путь
-const Booking = require('../models/booking'); // Обратите внимание на корректный путь
+const sendToTelegram = require('../Telegram'); // Обратите внимание на корректный путь
+const Booking = require('../models/Booking'); // Обратите внимание на корректный путь
 
 // Пример создания бронирования
 const createBooking = async (req, res) => {
