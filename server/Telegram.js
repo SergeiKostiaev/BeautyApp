@@ -1,8 +1,9 @@
 const fetch = require('node-fetch');
 
+// Функция отправки сообщения в Telegram
 const sendToTelegram = async (message, bookingId) => {
     const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-    const chatId = '414951154'; // Замените на правильный ID чата
+    const chatId = '414951154';
     const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
 
     try {

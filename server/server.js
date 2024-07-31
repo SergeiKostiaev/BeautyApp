@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const path = require('path');
 const multer = require('multer');
 const dotenv = require('dotenv');
+const fetch = require('node-fetch');
+const bodyParser = require('body-parser');
 dotenv.config();
 
 const bookingsRouter = require('./routes/bookings');
@@ -18,7 +20,8 @@ const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot'); // Подключение модели для временных слотов
 const sendToTelegram = require('./Telegram');
 const cancelBookingById = require('./cancelBookingById'); // Подключение функции отмены бронирования
-const bodyParser = require('body-parser');
+
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -190,6 +193,7 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
+// Обработка запросов для отмены бронирования через Telegram
 // Обработка запросов для отмены бронирования через Telegram
 app.post('/webhook', async (req, res) => {
     const update = req.body;
