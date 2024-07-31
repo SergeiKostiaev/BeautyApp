@@ -5,11 +5,14 @@ const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
 // Функция отправки сообщения в Telegram
 const sendToTelegram = async (message, bookingId) => {
     try {
-        if (!bookingId || typeof bookingId !== 'string') {
-            throw new Error('Invalid bookingId');
-        }
+        console.log('Attempting to send message to Telegram');
+        console.log('Message:', message);
+        console.log('Booking ID:', bookingId);
 
-        console.log('Sending message to Telegram with bookingId:', bookingId); // Логируем ID бронирования
+        if (!bookingId || typeof bookingId !== 'string') {
+            console.error('Invalid or missing bookingId');
+            throw new Error('Invalid or missing bookingId');
+        }
 
         const response = await fetch(`${telegramUrl}/sendMessage`, {
             method: 'POST',
@@ -37,6 +40,7 @@ const sendToTelegram = async (message, bookingId) => {
         if (!response.ok) {
             throw new Error(`Telegram API responded with status ${response.status}`);
         }
+
         console.log('Message sent to Telegram');
     } catch (error) {
         console.error('Error sending message to Telegram:', error);
