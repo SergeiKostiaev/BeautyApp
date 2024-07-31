@@ -7,7 +7,7 @@ const cancelBookingById = async (bookingId) => {
     }
 
     try {
-        const result = await Booking.findByIdAndUpdate(bookingId, { isCancelled: true }, { new: true });
+        const result = await Booking.findByIdAndUpdate(bookingId, { booked: false }, { new: true });
 
         if (!result) {
             throw new Error('Booking not found');

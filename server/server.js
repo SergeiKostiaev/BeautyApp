@@ -156,6 +156,7 @@ app.post('/api/send-telegram', async (req, res) => {
     }
 });
 
+
 app.post('/webhook', async (req, res) => {
     const update = req.body;
 
@@ -171,8 +172,9 @@ app.post('/webhook', async (req, res) => {
 
         try {
             console.log('Canceling booking with ID:', bookingId);
-            await cancelBookingById(bookingId);
+            const result = await cancelBookingById(bookingId);
 
+            // Отправка ответа в Telegram
             await fetch(`${telegramUrl}/answerCallbackQuery`, {
                 method: 'POST',
                 body: JSON.stringify({
