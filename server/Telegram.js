@@ -1,15 +1,19 @@
-const fetch = require('node-fetch');
-
-const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
-
-// Функция отправки сообщения в Telegram с кнопкой отмены
 const sendToTelegram = async (message, bookingId) => {
+    const { default: fetch } = await import('node-fetch');
+    const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+    const chatId = '414951154'; // Замените на правильный ID чата
+    const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+
     try {
-        const response = await fetch(`${telegramUrl}/sendMessage`, {
+        // Проверяем, что bookingId не undefined и имеет корректный формат
+        if (!bookingId || typeof bookingId !== 'string') {
+            throw new Error('Invalid bookingId');
+        }
+
+        const response = await fetch(telegramUrl, {
             method: 'POST',
             body: JSON.stringify({
-                chat_id: '414951154',
+                chat_id: chatId,
                 text: `${message}\n\nBooking ID: ${bookingId}`,
                 parse_mode: 'HTML',
                 reply_markup: {
@@ -27,43 +31,16 @@ const sendToTelegram = async (message, bookingId) => {
         });
 
         const responseBody = await response.json();
+        console.log('Response from Telegram:', responseBody);
+
         if (!response.ok) {
             throw new Error(`Telegram API responded with status ${response.status}`);
         }
-
-        console.log('Message sent to Telegram:', responseBody);
+        console.log('Message sent to Telegram');
     } catch (error) {
         console.error('Error sending message to Telegram:', error);
         throw error;
     }
 };
 
-
-
-// const sendToTelegram = async (message) => {
-//     try {
-//         const response = await fetch(`${telegramUrl}/sendMessage`, {
-//             method: 'POST',
-//             body: JSON.stringify({
-//                 chat_id: '414951154',
-//                 text: message,
-//                 parse_mode: 'HTML',
-//             }),
-//             headers: { 'Content-Type': 'application/json' },
-//         });
-//
-//         const responseBody = await response.json();
-//
-//         if (!response.ok) {
-//             throw new Error(`Telegram API responded with status ${response.status}`);
-//         }
-//
-//         console.log('Message sent to Telegram');
-//     } catch (error) {
-//         console.error('Error sending message to Telegram:', error);
-//         throw error;
-//     }
-// };
-
-// Экспортируем функцию
-module.exports = sendToTelegram;
+export default sendToTelegram;
