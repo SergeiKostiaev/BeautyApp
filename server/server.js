@@ -191,43 +191,38 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 // Обработка запросов для отмены бронирования через Telegram
-app.post('/api/telegram/webhook', async (req, res) => {
-    console.log('Received webhook:', req.body);
+app.post('/webhook', async (req, res) => {
+    const update = req.body;
 
-    const { callback_query } = req.body;
+    if (update.callback_query) {
+        const callbackData = update.callback_query.data;
+        const bookingId = callbackData.split('_')[1]; // Извлекаем Booking ID
 
-    if (callback_query && callback_query.data) {
-        const parts = callback_query.data.split('_');
-        if (parts.length === 2) {
-            const action = parts[0]; // 'cancel'
-            const bookingId = parts[1]; // Должен быть bookingId
+        try {
+            // Отмена бронирования и обновление статуса в базе данных
+            await cancelBookingById(bookingId);
 
-            try {
-                if (action === 'cancel') {
-                    await cancelBookingById(bookingId); // Убедитесь, что функция правильно импортирована
-                    const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
-                    await fetch(telegramUrl, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            chat_id: callback_query.message.chat.id,
-                            text: `Booking ${bookingId} has been successfully canceled.`,
-                        }),
-                        headers: { 'Content-Type': 'application/json' },
-                    });
+            // Отправка ответа пользователю Telegram
+            const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+            const telegramUrl = `https://api.telegram.org/bot${telegramToken}/answerCallbackQuery`;
 
-                    res.status(200).send('Booking canceled');
-                } else {
-                    res.status(400).send('Invalid action');
-                }
-            } catch (error) {
-                console.error('Error processing callback query:', error);
-                res.status(500).send('Internal server error');
-            }
-        } else {
-            res.status(400).send('Invalid callback data format');
+            await fetch(telegramUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    callback_query_id: update.callback_query.id,
+                    text: 'Booking canceled successfully',
+                    show_alert: false // Можно показать уведомление пользователю
+                }),
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            res.send('Booking canceled and response sent to Telegram');
+        } catch (error) {
+            console.error('Error processing callback query:', error);
+            res.status(500).send('Error processing request');
         }
     } else {
-        res.status(400).send('Bad request');
+        res.send('Not a callback query');
     }
 });
 
