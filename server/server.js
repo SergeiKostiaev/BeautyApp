@@ -160,7 +160,7 @@ app.post('/api/send-telegram', async (req, res) => {
 app.post('/webhook', async (req, res) => {
     const update = req.body;
 
-    if (update.callback_query) {
+    if (update.callback_query && update.callback_query.data) {
         const callbackData = update.callback_query.data;
         const [action, bookingId] = callbackData.split('_'); // Извлечение _id
 
