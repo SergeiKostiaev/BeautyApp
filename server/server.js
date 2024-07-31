@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Подключение к MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking')
+mongoose.connect('mongodb://127.0.0.1:27017/beauty-booking', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch((err) => console.error('MongoDB connection error:', err));
 
@@ -66,7 +66,7 @@ const upload = multer({ storage: storage });
 app.get('/api/schedules/:masterId', async (req, res) => {
     try {
         const masterId = req.params.masterId;
-        const schedule = await Schedule.find({ masterId });
+        const schedule = await Schedule.find({ masterId }); // Убедитесь, что Schedule импортирован или используется правильно
         res.json(schedule);
     } catch (error) {
         console.error('Error fetching schedule:', error);
