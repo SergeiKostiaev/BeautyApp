@@ -67,6 +67,9 @@ app.use('/api/services', servicesRouter); // Использование роут
 app.use('/api/schedules', schedulesRouter);
 app.use(bodyParser.json());
 
+const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
+
 // Настройка multer для хранения файлов
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -196,6 +199,7 @@ app.post('/api/send-telegram', async (req, res) => {
 // Обработка запросов для отмены бронирования через Telegram
 app.post('/webhook', async (req, res) => {
     const update = req.body;
+    console.log('Received webhook update:', JSON.stringify(update, null, 2)); // Логируем входящий запрос
 
     if (update.callback_query) {
         const callbackData = update.callback_query.data;
@@ -207,10 +211,7 @@ app.post('/webhook', async (req, res) => {
             await cancelBookingById(bookingId);
 
             // Отправка ответа пользователю Telegram
-            const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-            const telegramUrl = `https://api.telegram.org/bot${telegramToken}/answerCallbackQuery`;
-
-            await fetch(telegramUrl, {
+            await fetch(`${telegramUrl}/answerCallbackQuery`, {
                 method: 'POST',
                 body: JSON.stringify({
                     callback_query_id: update.callback_query.id,

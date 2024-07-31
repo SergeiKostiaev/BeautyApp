@@ -1,23 +1,16 @@
 const fetch = require('node-fetch');
 
+const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
+const telegramUrl = `https://api.telegram.org/bot${telegramToken}`;
 // Функция отправки сообщения в Telegram
 const sendToTelegram = async (message, bookingId) => {
-    const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-    const chatId = '414951154'; // Замените на правильный ID чата
-    const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
-
     try {
-        // Проверяем, что bookingId не undefined и имеет корректный формат
-        if (!bookingId || typeof bookingId !== 'string') {
-            throw new Error('Invalid bookingId');
-        }
-
         console.log('Sending message to Telegram with bookingId:', bookingId); // Логируем ID бронирования
 
-        const response = await fetch(telegramUrl, {
+        const response = await fetch(`${telegramUrl}/sendMessage`, {
             method: 'POST',
             body: JSON.stringify({
-                chat_id: chatId,
+                chat_id: '414951154', // Замените на правильный ID чата
                 text: `${message}\n\nBooking ID: ${bookingId}`,
                 parse_mode: 'HTML',
                 reply_markup: {
