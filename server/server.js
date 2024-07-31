@@ -18,7 +18,11 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
-const { cancelBooking, createBooking } = require('../client/src/components/bookingService'); // Правильный путь
+const bookingService = await import('../client/src/components/bookingService');
+
+// Используйте экспортированные функции из bookingService
+const createBooking = bookingService.createBooking;
+const cancelBooking = bookingService.cancelBooking;
 // const createBooking = require('./routes/bookingController');
 
 const app = express();
@@ -273,7 +277,26 @@ app.get('/api/time-slots/master/:masterId', async (req, res) => {
     }
 });
 
-app.post('/bookings', createBooking);
+app.post('/create-booking', async (req, res) => {
+    try {
+        const bookingData = req.body;
+        const result = await createBooking(bookingData);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create booking' });
+    }
+});
+
+app.post('/cancel-booking', async (req, res) => {
+    try {
+        const { bookingId } = req.body;
+        const result = await cancelBooking(bookingId);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to cancel booking' });
+    }
+});
+
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 
