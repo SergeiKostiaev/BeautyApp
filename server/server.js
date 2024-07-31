@@ -162,17 +162,17 @@ app.post('/webhook', async (req, res) => {
 
     if (update.callback_query && update.callback_query.data) {
         const callbackData = update.callback_query.data;
-        const [action, bookingId] = callbackData.split('_'); // Извлечение _id
+        const [action, bookingId] = callbackData.split('_'); // Извлечение action и bookingId
 
         if (action !== 'cancel' || !mongoose.Types.ObjectId.isValid(bookingId)) {
-            console.error('Invalid action or bookingId');
+            console.error('Invalid action or bookingId:', { action, bookingId });
             res.status(400).send('Invalid request');
             return;
         }
 
         try {
             console.log('Canceling booking with ID:', bookingId);
-            await cancelBookingById(bookingId);
+            const booking = await cancelBookingById(bookingId);
 
             // Отправка ответа в Telegram
             await fetch(`${telegramUrl}/answerCallbackQuery`, {
@@ -194,6 +194,7 @@ app.post('/webhook', async (req, res) => {
         res.status(400).send('Not a callback query');
     }
 });
+
 
 app.delete('/api/masters/:id', async (req, res) => {
     try {
