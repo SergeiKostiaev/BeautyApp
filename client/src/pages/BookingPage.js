@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Container, TextField, Button, Typography, styled } from '@mui/material';
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { createBooking } from '../../../server/routes/bookingService.js'; // Импортируем функцию из сервиса
+import { createBooking } from '../components/bookingService.js'; // Импортируем функцию из сервиса
 
 const StyledButton = styled(Button)(({ theme }) => ({
     position: 'fixed',

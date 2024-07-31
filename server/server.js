@@ -18,7 +18,7 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 const sendToTelegram = require('./Telegram');
-const { cancelBooking, createBooking } = require('./routes/bookingService'); // Правильный путь
+const { cancelBooking, createBooking } = require('../client/src/components/bookingService'); // Правильный путь
 // const createBooking = require('./routes/bookingController');
 
 const app = express();
