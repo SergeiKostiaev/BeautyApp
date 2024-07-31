@@ -1,7 +1,7 @@
 const sendToTelegram = async (message, bookingId) => {
     const { default: fetch } = await import('node-fetch');
     const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
-    const chatId = '414951154';
+    const chatId = '414951154'; // Замените на правильный ID чата
     const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
 
     try {
@@ -16,7 +16,7 @@ const sendToTelegram = async (message, bookingId) => {
                         [
                             {
                                 text: 'Отменить запись',
-                                callback_data: `cancel_${bookingId}`
+                                callback_data: `cancel_${bookingId}` // Убедитесь, что bookingId не undefined
                             }
                         ]
                     ]
@@ -37,3 +37,5 @@ const sendToTelegram = async (message, bookingId) => {
         throw error;
     }
 };
+
+export default sendToTelegram();
