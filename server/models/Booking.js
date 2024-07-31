@@ -19,14 +19,12 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
     masterId: mongoose.Schema.Types.ObjectId,
-    date: String,
-    time: String,
     customerName: String,
     customerPhone: String,
-    isCancelled: Boolean,
+    date: String,
+    time: String,
     booked: Boolean,
+    isCancelled: Boolean
 });
 
-const Booking = mongoose.model('Booking', bookingSchema);
-
-module.exports = Booking;
+module.exports = mongoose.model('Booking', bookingSchema);

@@ -124,6 +124,7 @@ app.post('/api/bookings', async (req, res) => {
 
         console.log('Booking created with ID:', newBooking._id);
 
+        // Передача ID в функцию отправки сообщения
         await sendToTelegram(`New booking:\nName: ${customerName}\nPhone: ${customerPhone}\nDate: ${date}\nTime: ${time}`, newBooking._id.toString());
 
         res.status(201).json(newBooking);

@@ -11,7 +11,7 @@ const sendToTelegram = async (message, bookingId) => {
         console.log('Booking ID:', bookingId);
 
         if (!bookingId || typeof bookingId !== 'string') {
-            console.error('Invalid or missing bookingId');
+            console.error('Invalid or missing bookingId:', bookingId);
             throw new Error('Invalid or missing bookingId');
         }
 
