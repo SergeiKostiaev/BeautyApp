@@ -156,13 +156,11 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 app.post('/webhook', async (req, res) => {
-    console.log('Received webhook update:', req.body);
-
     const update = req.body;
 
     if (update.callback_query) {
         const callbackData = update.callback_query.data;
-        const [action, bookingId] = callbackData.split('_'); // Извлекаем bookingId
+        const [action, bookingId] = callbackData.split('_'); // Извлекаем _id
 
         if (action !== 'cancel' || !bookingId) {
             console.error('Invalid action or missing bookingId');
@@ -174,7 +172,6 @@ app.post('/webhook', async (req, res) => {
             console.log('Canceling booking with ID:', bookingId);
             await cancelBookingById(bookingId); // Функция отмены бронирования
 
-            // Ответ на callback_query
             await fetch(`${telegramUrl}/answerCallbackQuery`, {
                 method: 'POST',
                 body: JSON.stringify({

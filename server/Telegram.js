@@ -10,8 +10,7 @@ const sendToTelegram = async (message, bookingId) => {
         console.log('Message:', message);
         console.log('Booking ID:', bookingId);
 
-        // Проверьте, что bookingId корректный
-        if (!bookingId || typeof bookingId !== 'string' || bookingId.trim() === '') {
+        if (!bookingId || typeof bookingId !== 'string') {
             console.error('Invalid or missing bookingId');
             throw new Error('Invalid or missing bookingId');
         }
@@ -19,7 +18,7 @@ const sendToTelegram = async (message, bookingId) => {
         const response = await fetch(`${telegramUrl}/sendMessage`, {
             method: 'POST',
             body: JSON.stringify({
-                chat_id: '414951154', // Замените на правильный ID чата
+                chat_id: '414951154',
                 text: `${message}\n\nBooking ID: ${bookingId}`,
                 parse_mode: 'HTML',
                 reply_markup: {
@@ -40,7 +39,7 @@ const sendToTelegram = async (message, bookingId) => {
         console.log('Response from Telegram:', responseBody);
 
         if (!response.ok) {
-            throw new Error(`Telegram API responded with status ${response.status}: ${responseBody.description}`);
+            throw new Error(`Telegram API responded with status ${response.status}`);
         }
 
         console.log('Message sent to Telegram');
