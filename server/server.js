@@ -199,45 +199,35 @@ app.post('/api/send-telegram', async (req, res) => {
 
 
 // Обработка webhook от Telegram
-// app.post('/api/telegram/webhook', async (req, res) => {
-//     console.log('Received webhook:', req.body);
-//
-//     const { callback_query } = req.body;
-//
-//     if (callback_query) {
-//         const { data, message } = callback_query;
-//
-//         console.log('Received callback query:', callback_query);
-//
-//         if (data && data.startsWith('cancel_')) {
-//             const bookingId = data.split('_')[1];
-//             console.log('Extracted bookingId:', bookingId);
-//
-//             try {
-//                 await cancelBookingById(bookingId);
-//                 // Отправьте подтверждение в Telegram, если нужно
-//                 res.send('OK');
-//             } catch (error) {
-//                 console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
-//                 res.status(500).send('Internal Server Error');
-//             }
-//         } else {
-//             console.log('Invalid callback query data');
-//             res.send('Invalid request');
-//         }
-//     } else {
-//         console.log('No callback_query received');
-//         res.send('No callback query');
-//     }
-// });
 app.post('/api/telegram/webhook', async (req, res) => {
-    try {
-        const bookingId = extractBookingIdFromRequest(req); // Определите функцию extractBookingIdFromRequest
-        await cancelBookingById(bookingId);
-        res.sendStatus(200);
-    } catch (error) {
-        console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
-        res.sendStatus(500);
+    console.log('Received webhook:', req.body);
+
+    const { callback_query } = req.body;
+
+    if (callback_query) {
+        const { data, message } = callback_query;
+
+        console.log('Received callback query:', callback_query);
+
+        if (data && data.startsWith('cancel_')) {
+            const bookingId = data.split('_')[1];
+            console.log('Extracted bookingId:', bookingId);
+
+            try {
+                await cancelBookingById(bookingId);
+                // Отправьте подтверждение в Telegram, если нужно
+                res.send('OK');
+            } catch (error) {
+                console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        } else {
+            console.log('Invalid callback query data');
+            res.send('Invalid request');
+        }
+    } else {
+        console.log('No callback_query received');
+        res.send('No callback query');
     }
 });
 
