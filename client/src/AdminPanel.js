@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import { Box, Typography, List, ListItem, Avatar, styled, Button } from '@mui/material';
+import { Box, Typography, List, ListItem, Button, styled } from '@mui/material';
 import { useTranslation } from 'react-i18next'; // Импорт хука для использования переводов
 import ServicesForm from './components/ServicesForm.js';
 import MastersForm from './components/MastersForm.js';
@@ -16,16 +16,13 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
     alignItems: 'center',
     textDecoration: 'none',
     padding: '10px',
-    '&:hover': {
-        backgroundColor: '#252525',
-    },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
     backgroundColor: '#252525',
     color: '#FFFFFF',
     '&:hover': {
-        backgroundColor: theme.palette.primary.dark,
+        backgroundColor: '#7b1fa2', // Установите цвет при наведении
     },
 }));
 

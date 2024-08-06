@@ -12,8 +12,13 @@ const masterSchema = new Schema({
         default: ''
     },
     service: {
-        type: Schema.Types.ObjectId,
-        ref: 'Service', // Убедитесь, что 'Service' соответствует имени модели услуг
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Service',
+        required: true
+    },
+    country: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Country',
         required: true
     },
     timeslots: [
@@ -22,6 +27,8 @@ const masterSchema = new Schema({
             ref: 'TimeSlot'
         }
     ]
+}, {
+    timestamps: true // Добавляет createdAt и updatedAt поля в документ
 });
 
 module.exports = mongoose.model('Master', masterSchema);

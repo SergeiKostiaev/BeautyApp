@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Container, TextField, Button, Typography, styled } from '@mui/material';
 import { useParams, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { createBooking } from '../components/bookingService.js'; // Импортируем функцию из сервиса
+import { createBooking } from '../components/bookingService.js';
 
 const StyledButton = styled(Button)(({ theme }) => ({
     position: 'fixed',
@@ -40,19 +40,17 @@ const BookingPage = () => {
     const fetchAvailableTimeSlots = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}`, {
+            const response = await axios.get(`https://devprimeclients.ru/api/time-slots/master/${masterId}`, {
                 params: { date },
                 headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
             });
+            console.log('API response data:', response.data);
 
-            console.log('API Response:', response.data);
-
-            if (Array.isArray(response.data)) {
+            if (response.data && Array.isArray(response.data)) {
                 const timeSlotsWithAvailability = response.data.map(slot => ({
                     ...slot,
                     isAvailable: !slot.booked,
                 }));
-                console.log('Processed time slots:', timeSlotsWithAvailability);
                 setAvailableTimeSlots(timeSlotsWithAvailability);
             } else {
                 console.error('Unexpected response format:', response.data);
@@ -70,6 +68,17 @@ const BookingPage = () => {
         setDate(newDate);
         setAvailableTimeSlots([]);
     }, []);
+
+    const updateTimeSlotStatus = async (slotId) => {
+        try {
+            const response = await axios.put(`https://devprimeclients.ru/api/time-slots/${slotId}`, {
+                booked: true,
+            });
+            console.log('Time slot updated:', response.data);
+        } catch (error) {
+            console.error('Error updating time slot:', error);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -90,6 +99,10 @@ const BookingPage = () => {
             setLoading(true);
             const response = await createBooking(bookingData);
             console.log('Booking created:', response);
+
+            // Обновление статуса временного интервала
+            await updateTimeSlotStatus(selectedTimeSlot._id);
+
             await fetchAvailableTimeSlots();
             setBookingSuccess(true);
         } catch (error) {

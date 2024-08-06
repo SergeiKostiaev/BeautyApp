@@ -28,6 +28,7 @@
     "no_time_slots": "Немає часових інтервалів"
   },
   "time_settings_form": {
+    "select_country": "Виберіть країну",
     "title": "Налаштування часових інтервалів",
     "select_master": "Оберіть майстра",
     "select_date": "Оберіть дату",
@@ -51,10 +52,6 @@
   "notifications": {
     "master_added_success": "Майстер успішно доданий"
   },
-  "adminPanel": "Адміністративна панель",
-  "addService": "Додати послугу",
-  "addMaster": "Додати майстра",
-  "timeSettings": "Налаштування часу",
   "service_created_devprime": "Створено сервіс ",
   "adminPanel": "Адміністративна панель",
   "addService": "Додати послугу",
@@ -62,5 +59,22 @@
   "timeSettings": "Налаштування часу",
   "deleteMaster": "Видалити майстра",
   "deleteService": "Видалити послугу",
-  "delete": "Видалити"
+  "delete": "Видалити",
+  "addNewService": "Додати нову послугу",
+  "serviceName": "Назва послуги",
+  "cost": "Вартість",
+  "errorFetchingCountries": "Помилка при отриманні країн. Спробуйте ще раз.",
+  "allFieldsRequired": "Всі поля є обов'язковими.",
+  "errorAddingService": "Помилка при додаванні послуги. Спробуйте ще раз.",
+  "serviceAddedSuccessfully": "Послуга успішно додана!",
+  "masterName": "Ім'я майстра",
+  "country": "Країна",
+  "service": "Послуга",
+  "addMasterButton": "Додати майстра",
+  "fetchServicesError": "Помилка при отриманні послуг",
+  "fetchCountriesError": "Помилка при отриманні країн",
+  "dataFormatError": "Неправильний формат даних країн",
+  "masterCreatedSuccess": "Майстер успішно створений!",
+  "masterCreationError": "Помилка при створенні майстра",
+  "selectMaster": "Виберіть Майстер"
 }

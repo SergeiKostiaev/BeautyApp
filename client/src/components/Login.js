@@ -11,6 +11,10 @@ const StyledPrimaryButton = styled(Button)({
     },
 });
 
+// Используем переменные окружения
+const fixedUsername = process.env.REACT_APP_LOGIN_USERNAME;
+const fixedPassword = process.env.REACT_APP_LOGIN_PASSWORD;
+
 const LoginForm = ({ onLogin }) => {
     const { t } = useTranslation();
     const [username, setUsername] = useState('');
@@ -20,7 +24,7 @@ const LoginForm = ({ onLogin }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (username === 'admin' && password === 'admin') {
+        if (username === fixedUsername && password === fixedPassword) {
             onLogin();
             navigate('/admin');
         } else {

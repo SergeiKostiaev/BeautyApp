@@ -18,11 +18,20 @@ import logo from './DevPrimeClients.png';
 import ProtectedRoute from './ProtectedRoute.js';
 import './i18n.js';
 
+const countryOptions = {
+    '66a7a0bd704fc0eaa855a7ce': 'Canada',
+    '66a7a0bd704fc0eaa855a7cf': 'Ukraine',
+    '66a7a0bd704fc0eaa855a7d0': 'Poland',
+    '66a7a0bd704fc0eaa855a7d1': 'France',
+};
+
 const App = () => {
     const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
     const { t, i18n } = useTranslation();
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [languageAnchorEl, setLanguageAnchorEl] = useState(null);
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [countryAnchorEl, setCountryAnchorEl] = useState(null);
+    const [selectedCountry, setSelectedCountry] = useState('66a7a0bd704fc0eaa855a7ce'); // Default countryId
 
     useEffect(() => {
         const adminStatus = localStorage.getItem('isAdminLoggedIn');
@@ -42,12 +51,12 @@ const App = () => {
     };
 
     const handleLanguageClick = (event) => {
-        setAnchorEl(event.currentTarget);
+        setLanguageAnchorEl(event.currentTarget);
     };
 
     const handleLanguageClose = (lng) => {
         i18n.changeLanguage(lng);
-        setAnchorEl(null);
+        setLanguageAnchorEl(null);
     };
 
     const handleMenuClick = (event) => {
@@ -60,8 +69,19 @@ const App = () => {
 
     const handleLogoClick = () => {
         setMenuAnchorEl(null);
-        setAnchorEl(null);
+        setLanguageAnchorEl(null);
     };
+
+    const handleCountryClick = (event) => {
+        setCountryAnchorEl(event.currentTarget);
+    };
+
+    const handleCountryClose = (countryId) => {
+        setSelectedCountry(countryId);
+        setCountryAnchorEl(null);
+    };
+
+    const selectedCountryName = countryOptions[selectedCountry] || 'Select Country';
 
     return (
         <Router>
@@ -70,7 +90,7 @@ const App = () => {
                 <Toolbar style={{ backgroundColor: '#252525', display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="h6">
                         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }} onClick={handleLogoClick}>
-                            <img src={logo} alt="Logo" style={{ width: '110px', height: '12px', marginRight: '10px' }} />
+                            <img src={logo} alt="Logo" style={{ width: '135px', height: '15px', marginRight: '10px' }} />
                         </Link>
                     </Typography>
                     <div>
@@ -106,24 +126,38 @@ const App = () => {
                             {i18n.language === 'ua' ? 'UA' : 'EN'}
                         </Button>
                         <Menu
-                            anchorEl={anchorEl}
+                            anchorEl={languageAnchorEl}
                             keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={() => setAnchorEl(null)}
+                            open={Boolean(languageAnchorEl)}
+                            onClose={() => setLanguageAnchorEl(null)}
                         >
                             <MenuItem onClick={() => handleLanguageClose('en')}>English</MenuItem>
                             <MenuItem onClick={() => handleLanguageClose('ua')}>Українська</MenuItem>
+                        </Menu>
+                        <Button color="inherit" onClick={handleCountryClick} style={{ color: '#FFFFFF' }}>
+                            {selectedCountryName}
+                        </Button>
+                        <Menu
+                            anchorEl={countryAnchorEl}
+                            keepMounted
+                            open={Boolean(countryAnchorEl)}
+                            onClose={() => setCountryAnchorEl(null)}
+                        >
+                            {Object.keys(countryOptions).map(countryId => (
+                                <MenuItem key={countryId} onClick={() => handleCountryClose(countryId)}>
+                                    {countryOptions[countryId]}
+                                </MenuItem>
+                            ))}
                         </Menu>
                     </div>
                 </Toolbar>
             </AppBar>
             <Container style={{ marginTop: '80px', paddingBottom: '50px' }}>
                 <Routes>
-                    <Route path="/" element={<ServicesPage />} />
+                    <Route path="/" element={<ServicesPage selectedCountry={selectedCountry} />} />
                     <Route path="/masters/:serviceId" element={<MastersPage />} />
                     <Route path="/booking/:masterId" element={<BookingPage />} />
                     <Route path="/success" element={<SuccessPage />} />
-
                     <Route
                         path="/admin/*"
                         element={
@@ -179,4 +213,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default App

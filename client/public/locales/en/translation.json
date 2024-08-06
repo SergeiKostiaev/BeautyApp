@@ -38,7 +38,8 @@
     "loading_masters_error": "Error loading masters",
     "loading_time_slots_error": "Error fetching time slots",
     "time_slot_added": "Interval successfully added",
-    "create_time_slot_error": "Error creating time slot"
+    "create_time_slot_error": "Error creating time slot",
+    "select_country": "Select country"
   },
   "masters_page": {
     "select_master": "Select a master for {{serviceName}}",
@@ -49,16 +50,28 @@
   "notifications": {
     "master_added_success": "Master successfully added"
   },
-  "adminPanel": "Admin Panel",
-  "addService": "Add Service",
-  "addMaster": "Add Master",
-  "timeSettings": "Time Settings",
   "service_created_devprime": "Service was create ",
   "adminPanel": "Admin Panel",
-  "addService": "Add Service",
-  "addMaster": "Add Master",
   "timeSettings": "Time Settings",
   "deleteMaster": "Delete Master",
   "deleteService": "Delete Service",
-  "delete": "Delete"
+  "delete": "Delete",
+  "addNewService": "Add New Service",
+  "serviceName": "Service Name",
+  "cost": "Cost",
+  "addService": "Add Service",
+  "errorFetchingCountries": "Error fetching countries. Please try again.",
+  "allFieldsRequired": "All fields are required.",
+  "errorAddingService": "Error adding service. Please try again.",
+  "serviceAddedSuccessfully": "Service added successfully!",
+  "addMaster": "Add Master",
+  "masterName": "Master Name",
+  "country": "Country",
+  "service": "Service",
+  "addMasterButton": "Add Master",
+  "fetchServicesError": "Error fetching services",
+  "fetchCountriesError": "Error fetching countries",
+  "dataFormatError": "Incorrect countries data format",
+  "masterCreatedSuccess": "Master created successfully!",
+  "masterCreationError": "Error creating master"
 }

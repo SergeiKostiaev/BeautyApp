@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { List, ListItem, ListItemText, Avatar, Typography, styled, Box, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import logo from "../DevPrime.ru.png";
-// import { API_URL } from '../config.js';
 
 const StyledListItem = styled(ListItem)(({ theme, selected }) => ({
     backgroundColor: selected ? '#252525' : '#D9D9D9',
-    borderRadius: '10px', // скругление углов плашки
+    borderRadius: '10px',
     marginBottom: '10px',
     display: 'flex',
     alignItems: 'center',
@@ -24,7 +23,7 @@ const StyledAvatarBox = styled(Box)(({ theme }) => ({
     width: '137px',
     height: '76px',
     overflow: 'hidden',
-    borderRadius: '10px 0 0 10px', // скругление углов слева
+    borderRadius: '10px 0 0 10px',
 }));
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
@@ -64,10 +63,9 @@ const FooterText = styled(Typography)(({ theme }) => ({
     left: '50%',
     transform: 'translateX(-50%)',
     width: '100%',
-    // opacity: 0.5
 }));
 
-const ServicesPage = () => {
+const ServicesPage = ({ selectedCountry }) => {
     const { t } = useTranslation();
     const [services, setServices] = useState([]);
     const [selectedService, setSelectedService] = useState(null);
@@ -76,7 +74,9 @@ const ServicesPage = () => {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const response = await axios.get(`http://31.172.75.47:5000/api/services/`);
+                const response = await axios.get('https://devprimeclients.ru/api/services', {
+                    params: selectedCountry ? { country: selectedCountry } : {}
+                });
                 setServices(response.data);
             } catch (error) {
                 console.error('Error fetching services:', error);
@@ -84,7 +84,7 @@ const ServicesPage = () => {
         };
 
         fetchServices();
-    }, []);
+    }, [selectedCountry]);
 
     const handleServiceClick = (serviceId) => {
         setSelectedService(serviceId);
@@ -101,17 +101,20 @@ const ServicesPage = () => {
             <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', fontSize: '25px', fontWeight: '600' }}>
                 {t('select_service')}
             </Typography>
+
             <List>
-                {services.map((service) => (
+                {Array.isArray(services) && services.map((service) => (
                     <StyledListItem
                         key={service._id}
                         onClick={() => handleServiceClick(service._id)}
                         selected={selectedService === service._id}
                     >
                         <StyledAvatarBox>
-                            <StyledAvatar src={`http://31.172.75.47:5000${service.imageUrl}`} />
+                            <StyledAvatar src={`https://devprimeclients.ru${service.imageUrl}`} />
                         </StyledAvatarBox>
-                        <StyledListItemText primary={t(`services.${service.name}`)} />
+                        <StyledListItemText
+                            primary={`${t(`services.${service.name}`)} - $${service.cost}`}
+                        />
                     </StyledListItem>
                 ))}
             </List>
@@ -124,11 +127,9 @@ const ServicesPage = () => {
                 {t('next')}
             </FixedButton>
             <FooterText variant="body2">
-                {/*{t('service_created_devprime')}*/}
                 <a href="https://devprime.ru/" target="_blank" rel="noopener noreferrer">
                     <img src={logo} alt="Logo" style={{ width: '80px', height: '12px' }} />
                 </a>
-                 {/*, 2024*/}
             </FooterText>
         </div>
     );

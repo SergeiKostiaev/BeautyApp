@@ -21,7 +21,7 @@ const StyledAvatarBox = styled(Box)(({ theme }) => ({
     width: '137px',
     height: '76px',
     overflow: 'hidden',
-    borderRadius: '10px 0 0 10px', // скругление углов слева
+    borderRadius: '10px 0 0 10px',
 }));
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
@@ -40,7 +40,7 @@ const FixedButtonContainer = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px', // Отступ между кнопками
+    gap: '10px',
 }));
 
 const FixedButton = styled(Button)(({ theme }) => ({
@@ -82,11 +82,10 @@ const MastersPage = () => {
     const [selectedMaster, setSelectedMaster] = useState(null);
     const navigate = useNavigate();
 
-
     useEffect(() => {
         const fetchMasters = async () => {
             try {
-                const response = await axios.get(`http://31.172.75.47:5000/api/masters/by-service/${serviceId}`);
+                const response = await axios.get(`https://devprimeclients.ru/api/masters/by-service/${serviceId}`);
                 setMasters(response.data);
             } catch (error) {
                 console.error('Error fetching masters:', error);
@@ -95,7 +94,7 @@ const MastersPage = () => {
 
         const fetchServiceName = async () => {
             try {
-                const response = await axios.get(`http://31.172.75.47:5000/api/services/${serviceId}`);
+                const response = await axios.get(`https://devprimeclients.ru/api/services/${serviceId}`);
                 setServiceName(response.data.name);
             } catch (error) {
                 console.error('Error fetching service:', error);
@@ -116,7 +115,7 @@ const MastersPage = () => {
 
     const handleNextClick = () => {
         if (selectedMaster) {
-            navigate(`/booking/${selectedMaster}`); // Переход на страницу бронирования с выбранным мастером
+            navigate(`/booking/${selectedMaster}`);
         }
     };
 
@@ -133,7 +132,7 @@ const MastersPage = () => {
                         selected={selectedMaster === master._id}
                     >
                         <StyledAvatarBox>
-                            <StyledAvatar src={`http://31.172.75.47:5000${master.imageUrl}`} />
+                            <StyledAvatar src={`https://devprimeclients.ru${master.imageUrl}`} />
                         </StyledAvatarBox>
                         <Typography sx={{ flex: 1, ml: 2 }}>
                             {master.name}
@@ -150,11 +149,9 @@ const MastersPage = () => {
                 </FixedOutlinedButton>
             </FixedButtonContainer>
             <FooterText variant="body2">
-                {/*{t('service_created_devprime')}*/}
                 <a href="https://devprime.ru/" target="_blank" rel="noopener noreferrer">
                     <img src={logo} alt="Logo" style={{ width: '80px', height: '12px' }} />
                 </a>
-                 {/*2024*/}
             </FooterText>
         </Box>
     );

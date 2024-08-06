@@ -1,48 +1,122 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Typography, TextField, Button, List, ListItem, ListItemText, Snackbar, Alert, MenuItem } from '@mui/material';
+import {
+    Container,
+    Typography,
+    TextField,
+    Button,
+    List,
+    ListItem,
+    ListItemText,
+    Snackbar,
+    Alert,
+    MenuItem
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
-// import { API_URL } from '../config.js';
 
 const TimeSettingsForm = () => {
     const { t } = useTranslation();
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
-    const [timeSlots, setTimeSlots] = useState([]);
+    const [timeSlots, setTimeSlots] = useState([]); // Начальное значение - пустой массив
     const [masters, setMasters] = useState([]);
+    const [countries, setCountries] = useState([]);
     const [masterId, setMasterId] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
+    // Fetch countries
     useEffect(() => {
+        const fetchCountries = async () => {
+            try {
+                const response = await axios.get('https://devprimeclients.ru/api/countries');
+                setCountries(response.data);
+            } catch (error) {
+                console.error('Ошибка загрузки стран:', error);
+                setError(t('time_settings_form.loading_countries_error'));
+            }
+        };
+
+        fetchCountries();
+    }, [t]);
+
+    // Fetch masters based on selected country
+    useEffect(() => {
+        const fetchMasters = async () => {
+            if (selectedCountry) {
+                console.log(`Fetching masters for country: ${selectedCountry}`);
+                try {
+                    const response = await axios.get('https://devprimeclients.ru/api/masters', {
+                        params: { country: selectedCountry }
+                    });
+                    console.log('Masters response:', response.data);
+                    if (response.status === 200) {
+                        const data = response.data;
+                        if (Array.isArray(data)) {
+                            setMasters(data);
+                        } else {
+                            console.error('Некорректные данные мастеров:', data);
+                            setMasters([]);
+                        }
+                    } else {
+                        console.error('Ошибка статуса ответа:', response.status);
+                        setMasters([]);
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки мастеров:', error);
+                    if (error.response && error.response.data) {
+                        console.error('Ответ сервера:', error.response.data);
+                    }
+                    setError(t('time_settings_form.loading_masters_error'));
+                }
+            } else {
+                setMasters([]);
+            }
+        };
+
         fetchMasters();
-    }, []);
+    }, [selectedCountry, t]);
 
-    const fetchMasters = async () => {
-        try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/masters`);
-            setMasters(response.data);
-        } catch (error) {
-            console.error('Ошибка загрузки мастеров:', error);
-            setError(t('time_settings_form.loading_masters_error'));
-        }
-    };
+    // Fetch time slots based on master ID and date
+    useEffect(() => {
+        const fetchTimeSlots = async () => {
+            if (masterId && selectedDate) {
+                try {
+                    console.log(`Fetching time slots for master: ${masterId} and date: ${selectedDate}`);
+                    const response = await axios.get(`https://devprimeclients.ru/api/time-slots/master/${masterId}?date=${selectedDate}`);
+                    if (response.status === 200) {
+                        const data = response.data;
+                        if (Array.isArray(data)) {
+                            setTimeSlots(data);
+                        } else {
+                            console.error('Некорректные данные слотов времени:', data);
+                            setTimeSlots([]);
+                        }
+                    } else {
+                        console.error('Ошибка статуса ответа:', response.status);
+                        setTimeSlots([]);
+                    }
+                } catch (error) {
+                    console.error('Ошибка при получении слотов времени:', error);
+                    if (error.response && error.response.data) {
+                        console.error('Ответ сервера:', error.response.data);
+                    }
+                    setError(t('time_settings_form.loading_time_slots_error'));
+                }
+            } else {
+                setTimeSlots([]);
+            }
+        };
 
-    const fetchTimeSlots = async (masterId, date) => {
-        try {
-            const response = await axios.get(`http://31.172.75.47:5000/api/time-slots/master/${masterId}?date=${date}`);
-            setTimeSlots(response.data);
-        } catch (error) {
-            console.error('Ошибка при получении слотов времени:', error);
-            setError(t('time_settings_form.loading_time_slots_error'));
-        }
-    };
+        fetchTimeSlots();
+    }, [masterId, selectedDate, t]);
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Валидация на клиенте
         if (!startTime || !endTime || !masterId || !selectedDate) {
             setError('Все поля обязательны для заполнения.');
             return;
@@ -55,19 +129,17 @@ const TimeSettingsForm = () => {
             date: selectedDate
         };
 
-        console.log('Данные, отправляемые на сервер:', requestData);
-
         try {
-            const response = await axios.post(`http://31.172.75.47:5000/api/time-slots`, requestData);
+            const response = await axios.post('https://devprimeclients.ru/api/time-slots', requestData);
             const newTimeSlot = response.data;
-            setTimeSlots(prevTimeSlots => [...prevTimeSlots, newTimeSlot]);
+            setTimeSlots(prevTimeSlots => Array.isArray(prevTimeSlots) ? [...prevTimeSlots, newTimeSlot] : [newTimeSlot]);
             setStartTime('');
             setEndTime('');
             setSuccess(t('time_settings_form.time_slot_added'));
             setError(null);
         } catch (error) {
             console.error('Ошибка создания временного интервала:', error);
-            if (error.response) {
+            if (error.response && error.response.data) {
                 console.error('Сообщение об ошибке сервера:', error.response.data.message);
             }
             setError(t('time_settings_form.create_time_slot_error'));
@@ -75,29 +147,33 @@ const TimeSettingsForm = () => {
         }
     };
 
+    // Handle closing snackbars
     const handleCloseSnackbar = () => {
         setError(null);
         setSuccess(null);
     };
 
+    // Handle master change
     const handleMasterChange = (e) => {
-        const selectedMasterId = e.target.value;
-        setMasterId(selectedMasterId);
-        setSelectedDate(''); // Сбрасываем выбранную дату при изменении мастера
-        setTimeSlots([]); // Очищаем текущие временные интервалы
+        setMasterId(e.target.value);
+        setSelectedDate('');
+        setTimeSlots([]);
     };
 
+    // Handle country change
+    const handleCountryChange = (e) => {
+        const countryId = e.target.value;
+        console.log(`Selected country ID: ${countryId}`);
+        setSelectedCountry(countryId);
+        setMasterId('');
+        setSelectedDate('');
+        setTimeSlots([]);
+    };
+
+    // Handle date change
     const handleDateChange = (e) => {
         setSelectedDate(e.target.value);
     };
-
-    useEffect(() => {
-        if (masterId && selectedDate) {
-            fetchTimeSlots(masterId, selectedDate);
-        } else {
-            setTimeSlots([]); // Очищаем временные интервалы, если мастер или дата не выбраны
-        }
-    }, [masterId, selectedDate]);
 
     return (
         <Container>
@@ -107,6 +183,21 @@ const TimeSettingsForm = () => {
             <form onSubmit={handleSubmit}>
                 <TextField
                     select
+                    label={t('time_settings_form.select_country')}
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                    fullWidth
+                    margin="normal"
+                    required
+                >
+                    {countries.map((country) => (
+                        <MenuItem key={country._id} value={country._id}>
+                            {country.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+                <TextField
+                    select
                     label={t('time_settings_form.select_master')}
                     value={masterId}
                     onChange={handleMasterChange}
@@ -114,7 +205,7 @@ const TimeSettingsForm = () => {
                     margin="normal"
                     required
                 >
-                    {masters.map((master) => (
+                    {Array.isArray(masters) && masters.map((master) => (
                         <MenuItem key={master._id} value={master._id}>
                             {master.name}
                         </MenuItem>
@@ -167,7 +258,7 @@ const TimeSettingsForm = () => {
                 </Button>
             </form>
             <List>
-                {timeSlots.length === 0 ? (
+                {Array.isArray(timeSlots) && timeSlots.length === 0 ? (
                     <ListItem>
                         <ListItemText primary={t('time_settings_form.no_time_slots')} />
                     </ListItem>
