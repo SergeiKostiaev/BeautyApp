@@ -202,29 +202,32 @@ app.post('/api/send-telegram', async (req, res) => {
 app.post('/api/telegram/webhook', async (req, res) => {
     console.log('Received webhook:', req.body);
 
-    const { message } = req.body;
-    console.log('Received message:', message);
+    const { callback_query } = req.body;
 
-    if (message) {
-        const match = message.text.match(/cancel_(\d+)/);
-        if (match) {
-            const bookingId = match[1];
+    if (callback_query) {
+        const { data, message } = callback_query;
+
+        console.log('Received callback query:', callback_query);
+
+        if (data && data.startsWith('cancel_')) {
+            const bookingId = data.split('_')[1];
             console.log('Extracted bookingId:', bookingId);
 
             try {
                 await cancelBookingById(bookingId);
+                // Отправьте подтверждение в Telegram, если нужно
                 res.send('OK');
             } catch (error) {
                 console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
                 res.status(500).send('Internal Server Error');
             }
         } else {
-            console.log('Invalid request format');
+            console.log('Invalid callback query data');
             res.send('Invalid request');
         }
     } else {
-        console.log('No message received');
-        res.send('No message');
+        console.log('No callback_query received');
+        res.send('No callback query');
     }
 });
 
