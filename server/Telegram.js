@@ -16,8 +16,9 @@
 //
 // module.exports = sendToTelegram;
 
+const fetch = require('node-fetch'); // Используем require вместо import
+
 const sendToTelegram = async (message, bookingId) => {
-    const { default: fetch } = await import('node-fetch');
     const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
     const chatId = '414951154'; // Замените на правильный ID чата
     const telegramUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
@@ -61,4 +62,5 @@ const sendToTelegram = async (message, bookingId) => {
     }
 };
 
-export default sendToTelegram;
+module.exports = sendToTelegram; // Используем module.exports вместо export default
+
