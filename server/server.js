@@ -184,8 +184,11 @@ app.post('/api/time-slots', async (req, res) => {
 // Маршрут для отправки сообщений в Telegram
 app.post('/api/send-telegram', async (req, res) => {
     try {
-        const { message } = req.body;
-        await sendToTelegram(message);
+        const { message, bookingId } = req.body; // Убедитесь, что bookingId передается в запросе
+        if (!bookingId) {
+            return res.status(400).send('Missing bookingId');
+        }
+        await sendToTelegram(message, bookingId);
         res.status(200).send('Message sent to Telegram');
     } catch (error) {
         console.error('Ошибка при отправке сообщения в Telegram:', error);

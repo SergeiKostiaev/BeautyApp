@@ -1,22 +1,4 @@
-// const fetch = require('node-fetch'); // Используем require для импортирования
-//
-// const sendToTelegram = async (message, bookingId) => {
-//     const telegramUrl = `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`;
-//
-//     await fetch(telegramUrl, {
-//         method: 'POST',
-//         body: JSON.stringify({
-//             chat_id: process.env.TELEGRAM_CHAT_ID, // Убедитесь, что у вас есть этот ID в переменных окружения
-//             text: `${message}\nCancel booking: /cancel_${bookingId}`, // Пример текста сообщения
-//             parse_mode: 'HTML',
-//         }),
-//         headers: { 'Content-Type': 'application/json' },
-//     });
-// };
-//
-// module.exports = sendToTelegram;
-
-const fetch = require('node-fetch'); // Используем require вместо import
+const fetch = require('node-fetch'); // Убедитесь, что вы используете `require`
 
 const sendToTelegram = async (message, bookingId) => {
     const telegramToken = '7130422316:AAFt7OXkbmV0_ObdPOiGs6v44bXhQCGAAPY';
@@ -26,7 +8,7 @@ const sendToTelegram = async (message, bookingId) => {
     try {
         // Проверяем, что bookingId не undefined и имеет корректный формат
         if (!bookingId || typeof bookingId !== 'string') {
-            throw new Error('Invalid bookingId');
+            throw new Error('Invalid bookingId: ' + bookingId); // Добавляем больше информации
         }
 
         const response = await fetch(telegramUrl, {
@@ -62,5 +44,4 @@ const sendToTelegram = async (message, bookingId) => {
     }
 };
 
-module.exports = sendToTelegram; // Используем module.exports вместо export default
-
+module.exports = sendToTelegram;
