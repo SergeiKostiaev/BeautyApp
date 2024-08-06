@@ -1,9 +1,9 @@
-const { MongoClient, ObjectId } = require('mongodb'); // Убедитесь, что импортируете ObjectId
+const { MongoClient, ObjectId } = require('mongodb');
 
-const uri = 'mongodb://localhost:27017/'; // Замените на ваш URI
+const uri = 'mongodb://localhost:27017/';
 const client = new MongoClient(uri, { useUnifiedTopology: true });
-const dbName = 'beauty-booking'; // Замените на имя вашей базы данных
-const collectionName = 'bookings'; // Замените на имя вашей коллекции
+const dbName = 'beauty-booking';
+const collectionName = 'bookings';
 
 const cancelBookingById = async (bookingId) => {
     try {
@@ -12,7 +12,7 @@ const cancelBookingById = async (bookingId) => {
         const collection = db.collection(collectionName);
 
         const result = await collection.updateOne(
-            { _id: new ObjectId(bookingId) }, // Используйте new ObjectId()
+            { _id: new ObjectId(bookingId) },
             { $set: { booked: false } }
         );
 
@@ -28,3 +28,5 @@ const cancelBookingById = async (bookingId) => {
         await client.close();
     }
 };
+
+module.exports = { cancelBookingById };
