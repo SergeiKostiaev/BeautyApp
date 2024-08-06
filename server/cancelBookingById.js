@@ -1,18 +1,31 @@
-const Booking = require('./models/Booking'); // Убедитесь, что путь к модели правильный
+const { MongoClient, ObjectId } = require('mongodb');
+
+const uri = 'mongodb://localhost:27017'; // Замените на ваш URI
+const client = new MongoClient(uri, { useUnifiedTopology: true });
+const dbName = 'beauty-booking'; // Замените на имя вашей базы данных
+const collectionName = 'bookings'; // Замените на имя вашей коллекции
 
 const cancelBookingById = async (bookingId) => {
     try {
-        if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-            throw new Error('Invalid Booking ID');
-        }
-        const result = await Booking.findByIdAndDelete(bookingId); // Или метод для отмены бронирования
-        if (!result) {
+        await client.connect();
+        const db = client.db(dbName);
+        const collection = db.collection(collectionName);
+
+        const result = await collection.updateOne(
+            { _id: ObjectId(bookingId) }, // Преобразуйте bookingId в ObjectId, если ваш ID является ObjectId
+            { $set: { booked: false } }
+        );
+
+        if (result.matchedCount === 0) {
             throw new Error('Booking not found');
         }
-        return result;
+
+        console.log(`Booking ${bookingId} cancelled`);
     } catch (error) {
-        console.error('Error canceling booking:', error);
+        console.error('Ошибка при отмене бронирования:', error);
         throw error;
+    } finally {
+        await client.close();
     }
 };
 
