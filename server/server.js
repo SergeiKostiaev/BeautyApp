@@ -197,26 +197,32 @@ app.post('/api/send-telegram', async (req, res) => {
 });
 
 // Обработка webhook от Telegram
-app.post('/api/telegram/webhook', (req, res) => {
+app.post('/api/telegram/webhook', async (req, res) => {
     console.log('Received webhook:', req.body);
 
     const { message } = req.body;
+    console.log('Received message:', message);
 
     if (message) {
-        const bookingId = message.text.match(/cancel_(\d+)/);
-        if (bookingId) {
-            // Отмените запись в вашей системе
-            cancelBookingById(bookingId[1]).then(() => {
-                sendToTelegram('Запись отменена', bookingId[1]);
+        const match = message.text.match(/cancel_(\d+)/);
+        if (match) {
+            const bookingId = match[1];
+            console.log('Extracted bookingId:', bookingId);
+
+            try {
+                await cancelBookingById(bookingId);
+                await sendToTelegram('Запись отменена', bookingId);
                 res.send('OK');
-            }).catch(error => {
-                console.error('Ошибка при отмене бронирования:', error);
+            } catch (error) {
+                console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
                 res.status(500).send('Internal Server Error');
-            });
+            }
         } else {
+            console.log('Invalid request format');
             res.send('Invalid request');
         }
     } else {
+        console.log('No message received');
         res.send('No message');
     }
 });
