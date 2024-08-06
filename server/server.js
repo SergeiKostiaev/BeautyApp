@@ -23,6 +23,8 @@ const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 
 
+const { cancelBookingById } = require('./db');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -211,7 +213,7 @@ app.post('/api/telegram/webhook', async (req, res) => {
 
             try {
                 await cancelBookingById(bookingId);
-                await sendToTelegram('Запись отменена', bookingId);
+                // Тут можете добавить вызов функции для отправки сообщения в Telegram
                 res.send('OK');
             } catch (error) {
                 console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
