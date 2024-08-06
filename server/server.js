@@ -16,7 +16,7 @@ const countriesRouter = require('./routes/country');
 const sendToTelegram = require('./Telegram');
 const cancelBookingById = require('./cancelBookingById');
 
-const Country = require('./models/Country');
+const Country = require('./models/country');
 const Service = require('./models/Service');
 const Master = require('./models/Master');
 const Booking = require('./models/Booking');
