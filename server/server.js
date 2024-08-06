@@ -1,4 +1,5 @@
 const express = require('express');
+const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -22,8 +23,6 @@ const Master = require('./models/Master');
 const Booking = require('./models/Booking');
 const TimeSlot = require('./models/timeSlot');
 
-
-const { cancelBookingById } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -197,6 +196,35 @@ app.post('/api/send-telegram', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+const uri = 'mongodb://localhost:27017/'; // Замените на ваш URI
+const client = new MongoClient(uri, { useUnifiedTopology: true });
+const dbName = 'beauty-booking'; // Замените на имя вашей базы данных
+const collectionName = 'bookings'; // Замените на имя вашей коллекции
+
+const cancelBookingById = async (bookingId) => {
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const collection = db.collection(collectionName);
+
+        const result = await collection.updateOne(
+            { _id: ObjectId(bookingId) }, // Преобразуйте bookingId в ObjectId, если ваш ID является ObjectId
+            { $set: { booked: false } }
+        );
+
+        if (result.matchedCount === 0) {
+            throw new Error('Booking not found');
+        }
+
+        console.log(`Booking ${bookingId} cancelled`);
+    } catch (error) {
+        console.error('Ошибка при отмене бронирования:', error);
+        throw error;
+    } finally {
+        await client.close();
+    }
+};
 
 // Обработка webhook от Telegram
 app.post('/api/telegram/webhook', async (req, res) => {
