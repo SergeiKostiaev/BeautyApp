@@ -26,20 +26,12 @@ const TimeSlot = require('./models/timeSlot');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS настройки
+// CORS configuration
 const corsOptions = {
-    origin: (origin, callback) => {
-        const allowedOrigins = ['http://localhost:3000'];
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    optionsSuccessStatus: 200,
+    origin: 'https://devprimeclients.ru', // Замените на ваш фронтенд домен
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
-
-
 
 app.use(cors(corsOptions));
 app.use(express.json());
