@@ -215,10 +215,9 @@ app.post('/api/telegram/webhook', async (req, res) => {
 
             try {
                 await cancelBookingById(bookingId);
-                // Отправьте подтверждение в Telegram, если нужно
                 res.send('OK');
             } catch (error) {
-                console.error('Ошибка при отмене бронирования или отправке сообщения:', error);
+                console.error('Error cancelling booking or sending message:', error);
                 res.status(500).send('Internal Server Error');
             }
         } else {

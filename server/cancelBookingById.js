@@ -1,32 +1,34 @@
-const { MongoClient, ObjectId } = require('mongodb');
+const TimeSlot = require('./models/timeSlot');
+const Booking = require('./models/Booking');
 
-const uri = 'mongodb://localhost:27017/';
-const client = new MongoClient(uri, { useUnifiedTopology: true });
-const dbName = 'beauty-booking';
-const collectionName = 'bookings';
-
-const cancelBookingById = async (bookingId) => {
+async function cancelBookingById(bookingId) {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const collection = db.collection(collectionName);
-
-        const result = await collection.updateOne(
-            { _id: new ObjectId(bookingId) },
-            { $set: { booked: false } }
-        );
-
-        if (result.matchedCount === 0) {
+        // Найдите бронирование по ID
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
             throw new Error('Booking not found');
         }
 
+        // Найдите временной интервал по ID мастера и дате
+        const timeSlot = await TimeSlot.findOne({
+            masterId: booking.masterId,
+            date: booking.date,
+            startTime: booking.time // Предполагается, что время соответствует
+        });
+
+        if (!timeSlot) {
+            throw new Error('Time slot not found');
+        }
+
+        // Обновите статус временного интервала на доступный
+        timeSlot.booked = false;
+        await timeSlot.save();
+
         console.log(`Booking ${bookingId} cancelled`);
     } catch (error) {
-        console.error('Ошибка при отмене бронирования:', error);
+        console.error('Error cancelling booking:', error);
         throw error;
-    } finally {
-        await client.close();
     }
-};
+}
 
 module.exports = { cancelBookingById };
