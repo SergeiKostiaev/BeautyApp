@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 5000;
 // CORS configuration
 const corsOptions = {
     origin: 'https://devprimeclients.ru', // Замените на ваш фронтенд домен
-    // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
@@ -249,6 +249,27 @@ app.delete('/api/masters/:id', async (req, res) => {
         res.status(200).json({ message: 'Master deleted successfully' });
     } catch (error) {
         console.error('Ошибка при удалении мастера:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.delete('/api/services/:id', async (req, res) => {
+    try {
+        const serviceId = req.params.id;
+
+        if (!ObjectId.isValid(serviceId)) {
+            return res.status(400).json({ message: 'Invalid service ID' });
+        }
+
+        const service = await Service.findByIdAndDelete(serviceId);
+
+        if (!service) {
+            return res.status(404).json({ message: 'Service not found' });
+        }
+
+        res.status(200).json({ message: 'Service deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting service:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
