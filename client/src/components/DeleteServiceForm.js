@@ -31,6 +31,13 @@ const DeleteServiceForm = () => {
     const handleDelete = (serviceId) => {
         console.log(`Attempting to delete service with ID: ${serviceId}`);
 
+        // Проверка наличия сервиса перед удалением
+        const serviceToDelete = services.find(service => service._id === serviceId);
+        if (!serviceToDelete) {
+            alert('Service not found!');
+            return;
+        }
+
         axios.delete(`https://devprimeclients.ru/api/services/${serviceId}`)
             .then(() => {
                 console.log('Service deleted successfully');
