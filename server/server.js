@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 5000;
 // CORS configuration
 const corsOptions = {
     origin: 'https://devprimeclients.ru', // Замените на ваш фронтенд домен
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    // methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 };
 
