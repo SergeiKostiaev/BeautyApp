@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, List, ListItem, Button, styled } from '@mui/material';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 const StyledListItem = styled(ListItem)(({ theme }) => ({
@@ -23,9 +22,10 @@ const DeleteServiceForm = () => {
     const [services, setServices] = useState([]);
 
     useEffect(() => {
-        axios.get('https://devprimeclients.ru/api/services')
-            .then(response => setServices(response.data))
-            .catch(error => console.error(error));
+        fetch('https://devprimeclients.ru/api/services')
+            .then(response => response.json())
+            .then(data => setServices(data))
+            .catch(error => console.error('Error fetching services:', error));
     }, []);
 
     const handleDelete = (serviceId) => {
@@ -38,14 +38,22 @@ const DeleteServiceForm = () => {
             return;
         }
 
-        axios.delete(`https://devprimeclients.ru/api/services/${serviceId}`)
+        fetch(`https://devprimeclients.ru/api/services/${serviceId}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(() => {
                 console.log('Service deleted successfully');
                 setServices(services.filter(service => service._id !== serviceId));
             })
             .catch(error => {
                 console.error('There was an error deleting the service!', error);
-                alert(`Error deleting service: ${error.response ? error.response.data.message : error.message}`);
+                alert(`Error deleting service: ${error.message}`);
             });
     };
 
