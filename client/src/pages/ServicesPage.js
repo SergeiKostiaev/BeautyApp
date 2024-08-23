@@ -43,11 +43,12 @@ const StyledListItemText = styled(ListItemText)(({ theme }) => ({
 
 const FixedButton = styled(Button)(({ theme }) => ({
     position: 'fixed',
-    bottom: '40px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    width: 'calc(100% - 20px)',
-    maxWidth: '500px',
+    bottom: '20px', // Поднял чуть выше для видимости на экране
+    left: '0',
+    width: '100%', // Устанавливает ширину на всю ширину экрана
+    padding: '20px', // Увеличивает размер кнопки
+    fontSize: '18px', // Делает текст крупнее
+    maxWidth: '100%', // Устанавливает максимальную ширину на 100%
     backgroundColor: '#252525',
     color: '#FFFFFF',
     '&:hover': {
