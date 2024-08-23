@@ -152,6 +152,7 @@ const MastersPage = () => {
                     {t('back')}
                 </FixedOutlinedButton>
             </FixedButtonContainer>
+
         </Box>
     );
 };
