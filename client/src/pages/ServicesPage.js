@@ -89,7 +89,7 @@ const ServicesPage = ({ selectedCountry }) => {
     };
 
     return (
-        <div style={{ marginTop: '70px', marginLeft: '20px', marginRight: '20px', paddingBottom: '50px' }}>
+        <div style={{ marginTop: '80px', marginLeft: '20px', marginRight: '20px', paddingBottom: '50px' }}>
             <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', fontSize: '25px', fontWeight: '600' }}>
                 {t('select_service')}
             </Typography>
