@@ -56,7 +56,6 @@ const FixedButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-
 const ServicesPage = ({ selectedCountry }) => {
     const { t } = useTranslation();
     const [services, setServices] = useState([]);
@@ -89,7 +88,7 @@ const ServicesPage = ({ selectedCountry }) => {
     };
 
     return (
-        <div style={{ marginTop: '80px', marginLeft: '20px', marginRight: '20px', paddingBottom: '50px' }}>
+        <div style={{ marginTop: '110px', marginLeft: '20px', marginRight: '20px', paddingBottom: '50px' }}>
             <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', fontSize: '25px', fontWeight: '600' }}>
                 {t('select_service')}
             </Typography>
