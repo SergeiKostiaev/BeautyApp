@@ -90,7 +90,7 @@ const App = () => {
                 <Toolbar style={{ backgroundColor: '#252525', display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="h6">
                         <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }} onClick={handleLogoClick}>
-                            <h1>Online Services</h1>
+                            <h4>Online Services</h4>
                         </Link>
                     </Typography>
                     <div>
