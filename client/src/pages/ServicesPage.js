@@ -56,15 +56,6 @@ const FixedButton = styled(Button)(({ theme }) => ({
     },
 }));
 
-const FooterText = styled(Typography)(({ theme }) => ({
-    fontSize: '13px',
-    textAlign: 'center',
-    position: 'fixed',
-    bottom: '5px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    width: '100%',
-}));
 
 const ServicesPage = ({ selectedCountry }) => {
     const { t } = useTranslation();
