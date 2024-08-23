@@ -36,7 +36,7 @@ const FixedButtonContainer = styled(Box)(({ theme }) => ({
     left: '0',
     bottom: '30px',
     width: '100%',
-    padding: '10px 20px',
+    padding: '10px 0', // убираем боковые отступы для кнопок на всю ширину
     backgroundColor: theme.palette.background.default,
     display: 'flex',
     flexDirection: 'column',
@@ -124,7 +124,7 @@ const MastersPage = () => {
     };
 
     return (
-        <Box px={2} py={2} style={{ marginTop: '70px', marginLeft: '20px', marginRight: '20px' }}>
+        <Box px={2} py={2} style={{ marginTop: '70px' }}>
             <Typography variant="h4" component="h1" gutterBottom sx={{ fontSize: '25px', fontWeight: '600', textAlign: 'center' }}>
                 {t('masters_page.select_master', { serviceName: serviceName })}
             </Typography>
@@ -152,7 +152,6 @@ const MastersPage = () => {
                     {t('back')}
                 </FixedOutlinedButton>
             </FixedButtonContainer>
-
         </Box>
     );
 };
