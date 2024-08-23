@@ -46,6 +46,8 @@ const FixedButtonContainer = styled(Box)(({ theme }) => ({
 const FixedButton = styled(Button)(({ theme }) => ({
     width: '100%',
     textAlign: 'center',
+    padding: '20px',
+    fontSize: '18px',
     backgroundColor: '#252525',
     color: '#FFFFFF',
     '&:hover': {
@@ -56,6 +58,8 @@ const FixedButton = styled(Button)(({ theme }) => ({
 const FixedOutlinedButton = styled(Button)(({ theme }) => ({
     width: '100%',
     textAlign: 'center',
+    padding: '20px',
+    fontSize: '18px',
     borderColor: '#252525',
     color: '#252525',
     '&:hover': {
@@ -148,11 +152,6 @@ const MastersPage = () => {
                     {t('back')}
                 </FixedOutlinedButton>
             </FixedButtonContainer>
-            <FooterText variant="body2">
-                <a href="https://devprime.ru/" target="_blank" rel="noopener noreferrer">
-                    <img src={logo} alt="Logo" style={{ width: '80px', height: '12px' }} />
-                </a>
-            </FooterText>
         </Box>
     );
 };

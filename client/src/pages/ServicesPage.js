@@ -127,11 +127,6 @@ const ServicesPage = ({ selectedCountry }) => {
             >
                 {t('next')}
             </FixedButton>
-            <FooterText variant="body2">
-                <a href="https://devprime.ru/" target="_blank" rel="noopener noreferrer">
-                    <img src={logo} alt="Logo" style={{ width: '80px', height: '12px' }} />
-                </a>
-            </FooterText>
         </div>
     );
 };
